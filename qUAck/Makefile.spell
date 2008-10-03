@@ -1,0 +1,2 @@
+# CCFLAGS+=-DSPELLON -DSPELLROOT=\"/usr/local\"
+# LDFLAGS+=-laspell
