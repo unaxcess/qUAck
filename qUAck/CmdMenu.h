@@ -30,6 +30,7 @@
 #define ANN_BUSYCHECK 16
 #define ANN_DEBUGCHECK 32
 #define ANN_EXTRACHECK 64
+#define ANN_NOCAUGHTUPCHECK 128
 
 // Retro modes
 #define RETRO_NAMES 1
