@@ -3120,6 +3120,7 @@ bool CmdUserListMatch(EDF *pReply, int iListType, int iOwnerID)
 ** 11 - Sort by time (status messages only)
 ** 12 - Sort by name (hostname / client info)
 ** 13 - Sort by name (hostname / address info)
+** 14 - Sort by location
 */
 void CmdUserWho(EDF *pReply, int iListType)
 {
@@ -3188,6 +3189,10 @@ void CmdUserWho(EDF *pReply, int iListType)
       else if(iListType == 8)
       {
          pReply->SortAddKey("timebusy");
+      }
+      else if(iListType == 14)
+      {
+         pReply->SortAddKey("location");
       }
       else
       {
@@ -3618,7 +3623,7 @@ void CmdUserWho(EDF *pReply, int iListType)
          {
             debug(DEBUGLEVEL_DEBUG, "CmdUserWho status check %s\n", szField1);
          }
-         if((iListType >= 0 && iListType <= 3) || iListType == 6 || iListType == 12 || iListType == 13 ||
+         if((iListType >= 0 && iListType <= 3) || iListType == 6 || iListType == 12 || iListType == 13 || iListType == 14 ||
             (iListType == 4 && mask(iUserStatus, LOGIN_IDLE) == true) ||
             (iListType == 5 && mask(iUserStatus, LOGIN_IDLE) == false && mask(iUserStatus, LOGIN_BUSY) == false) ||
             (iListType == 7 && (bHidden == false || mask(iUserType, USERTYPE_AGENT) == true)) ||
