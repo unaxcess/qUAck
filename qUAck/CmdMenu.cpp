@@ -1344,7 +1344,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
    int iInterval = 0, iStatus = LOGIN_OFF, iTime = 0, iValue = 0, iNumMsgs = 0, iTotalMsgs = 0, iCurrLevel = LEVEL_NONE;
    int iSubType = 0, iNumKeeps = 0, iMsgType = 0, iColourLen = 0, iWriteTime = 0, iReturn = CMD_REDRAW, iMarkType = 0, iMarked = 0;
    int iReloadTime = 0, iNumVotes = 0, iTotalVotes = 0, iAccessMode = FOLDERMODE_NORMAL, iConnID = 0, iMoveType = 0, iUnread = 0, iUserID = 0;
-   bool bUserCheck = false, bFolderCheck = false, bAdminCheck = false, bForce = false, bDbgCheck = false, bBell = false;
+   bool bUserCheck = false, bFolderCheck = false, bAdminCheck = false, bForce = false, bDbgCheck = false, bBell = false, bNoCaughtupCheck = false;
    bool bRetro = false, bLoop = false, bExtraCheck = false, bFirst = true, bFakePage = false, bStatus = false, bLost = false, bAction = true, bDevOption = false;
    char szTime[100], szWrite[200], cColour = '6';
    char *szMessage = NULL, *szHostname = NULL, *szLocation = NULL, *szBy = NULL, *szText = NULL;
@@ -1371,6 +1371,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
    {
       m_pUser->GetChild("anntype", &iValue);
       bFolderCheck = mask(iValue, ANN_FOLDERCHECK);
+      bNoCaughtupCheck = mask(iValue, ANN_NOCAUGHTUPCHECK);
       bUserCheck = mask(iValue, ANN_USERCHECK);
       bAdminCheck = mask(iValue, ANN_ADMINCHECK);
       bDbgCheck = mask(iValue, ANN_DEBUGCHECK);
@@ -1380,6 +1381,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
       if(mask(iLStatus, LOGIN_BUSY) == true && mask(iValue, ANN_BUSYCHECK) == false)
       {
          bFolderCheck = false;
+         bNoCaughtupCheck = false;
          bUserCheck = false;
          bAdminCheck = false;
          bDbgCheck = false;
@@ -1797,7 +1799,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
 
             iReturn = CMD_RESET;
          }
-         else if(bFolderCheck == true)
+         else if(bFolderCheck == true && (bNoCaughtupCheck == false || iMarkType == 0))
          {
             pAnnounce->GetChild("foldername", &szFolder);
             pAnnounce->GetChild("fromname", &szBy);
@@ -2703,6 +2705,7 @@ int CmdWholistInput()
    pInput->MenuAdd('i', "show only Idle users", HELP_WHOLIST_I);
    pInput->MenuAdd('l', "show as name List", HELP_WHOLIST_L, true);
    pInput->MenuAdd('n', "sort by Name", HELP_WHOLIST_N);
+   pInput->MenuAdd('o', "sort by lOcation", HELP_WHOLIST_O);
    // pInput->MenuAdd('o', "Old style", HELP_WHOLIST_O);
    if(CmdVersion("2.5") >= 0)
    {
@@ -2755,9 +2758,9 @@ int CmdWholistInput()
          iWhoType = 2;
          break;
 
-      /* case 'o':
-         iWhoType = 9;
-         break; */
+      case 'o':
+         iWhoType = 14;
+         break;
 
       case 'p':
          iWhoType = 10;
@@ -5368,6 +5371,7 @@ void AlertsMenu(EDF *pUser, EDF *pRequest, int iAccessLevel)
 
       CmdOptionMenu(pInput, 'p', mask(iAnnType, ANN_PAGEBELL), "Page bell");
       CmdOptionMenu(pInput, 'f', mask(iAnnType, ANN_FOLDERCHECK), "Folder checking");
+      CmdOptionMenu(pInput, 'c', mask(iAnnType, ANN_NOCAUGHTUPCHECK), "no Caught-up checking");
       CmdOptionMenu(pInput, 'u', mask(iAnnType, ANN_USERCHECK), "User checking");
       if(iAccessLevel >= LEVEL_WITNESS)
       {
@@ -5396,6 +5400,10 @@ void AlertsMenu(EDF *pUser, EDF *pRequest, int iAccessLevel)
 
          case 'f':
             iAnnType = CmdAnnounceToggle(iAnnType, ANN_FOLDERCHECK, "Folder checking");
+            break;
+
+         case 'c':
+            iAnnType = CmdAnnounceToggle(iAnnType, ANN_NOCAUGHTUPCHECK, "No caught-up checking");
             break;
 
          case 'u':
