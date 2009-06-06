@@ -1104,7 +1104,7 @@ bool CmdRequest(const char *szRequest, EDF *pRequest, bool bDelete, EDF **pReply
    double dEntry = 0, dWrite = 0, dRead = 0, dInput = 0, dRefresh = 0, dRecieved = 0, dLoop = 0, dProcess = 0;
    long lWrite = 0, lRead = 0, lInput = 0, lRefresh = 0;
 
-   debug(DEBUGLEVEL_INFO, "CmdRequest entry %s %p %s %p %s\n", szRequest, pRequest, BoolStr(bDelete), pReply, BoolStr(bSupressError));
+   debug(DEBUGLEVEL_INFO, "CmdRequest entry %s %p %s %p %s %ld\n", szRequest, pRequest, BoolStr(bDelete), pReply, BoolStr(bSupressError), memusage());
 
    CmdRedraw(false);
 
