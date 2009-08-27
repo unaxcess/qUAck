@@ -2,12 +2,11 @@
 
 makeCheck()
 {
-# echo "Testing $1/Makefile"
 test -e $1/Makefile
 if [ $? = 0 ] ; then
-	echo -e "\t\tcd $1 ; make $2"
+	printf "\t\t%s\n" "cd $1 && make $2"
 #else
-#	echo "Does not exist"
+#	printf "Does not exist\n" 1>&2
 fi
 }
 
@@ -49,40 +48,35 @@ done
 
 doSuffix()
 {
-echo ".$1.o:"
-echo -e "\t\t\$(CC) \$(CCFLAGS) -c $< -o \$(@)"
-echo ""
+printf "%s\n\t\t%s\n" ".$1.o:" "\$(CC) \$(CCFLAGS) -c $< -o \$(@)"
 }
 
 doMakefileInc()
 {
-echo "# UNaXcess II Conferencing System"
-echo "# (c) 1999 Michael Wood (mike@compsoc.man.ac.uk)"
-echo "#"
-echo "# Makefile.inc: Common build options"
-echo "#"
-echo "# - To reduce warning output remove -Wall"
-echo "# - To turn of SSL remove CCSECURE and LDSECURE"
-echo ""
+arch=`uname | tr " " "-"`
 
-echo "SSLINC=/usr/local/ssl/include"
-echo "SSLLIB=/usr/local/ssl/lib"
-echo ""
+cat << EOF
+# UNaXcess II Conferencing System
+# (c) 1999 Michael Wood (mike@compsoc.man.ac.uk)
+#
+# Makefile.inc: Common build options
+#
+# - To reduce warning output remove -Wall
+# - To turn of SSL remove CCSECURE and LDSECURE
 
-arch=`uname`
-echo "CC=g++"
-echo "CCSECURE=-DCONNSECURE -I\$(SSLINC)"
-echo "INCCCFLAGS=-g -Wall -O2 -DUNIX -D$arch -DSTACKTRACEON -I.."
-echo "CCFLAGS=\$(INCCCFLAGS) \$(CCSECURE)"
-echo ""
+CC=g++
+CCSECURE=-DCONNSECURE
+INCCCFLAGS=-g -Wall -O2 -DUNIX -D$arch -DSTACKTRACEON -I..
+CCFLAGS=\$(INCCCFLAGS) \$(CCSECURE)
 
-echo "LD=g++"
-echo "LDSECURE=-L\$(SSLLIB) -lssl -lcrypto"
-echo "LDFLAGS=\$(LDSECURE)"
-echo ""
+LD=g++
+LDSECURE=-lssl -lcrypto
+LDFLAGS=\$(LDSECURE)
 
-echo ".SUFFIXES:\$(SUFFIXES) .cpp .cc .c"
-echo ""
+.SUFFIXES:\$(SUFFIXES) .cpp .cc .c
+
+EOF
+
 doSuffix cpp
 doSuffix cc
 doSuffix c
@@ -109,7 +103,7 @@ fi
 test -e Makefile.inc
 if [ $? != 0 ] ; then
 	echo "Creating include Makefile..."
-	doMakefileInc >> Makefile.inc
+	doMakefileInc > Makefile.inc
 fi
 
 test -e server
