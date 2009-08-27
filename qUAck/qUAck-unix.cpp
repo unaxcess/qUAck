@@ -743,6 +743,7 @@ void CmdWait()
 }
 
 #ifndef FreeBSD
+#ifndef Darwin
 bool procstat(int iPID, int *iPPID, int *iSession)
 {
    int fStat = -1;
@@ -870,12 +871,14 @@ bool ProxyHostEntry(EDF *pEDF, struct utmp *pEntry)
 }
 
 #endif
+#endif
 
 bool ProxyHost(EDF *pEDF)
 {
    debug(DEBUGLEVEL_INFO, "ProxyHost entry\n");
 
 #ifndef FreeBSD
+#ifndef Darwin
    int iPID = 0, iPPID = 0, iSession = 0, iPrevSession = 0;
    struct utmp *pEntry = NULL;
 
@@ -920,6 +923,7 @@ bool ProxyHost(EDF *pEDF)
    {
       ProxyHostEntry(pEDF, pEntry);
    }
+#endif
 #endif
 
    debug(DEBUGLEVEL_INFO, "ProxyHost exit true\n");
