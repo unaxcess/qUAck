@@ -4689,7 +4689,7 @@ void CmdUserView(EDF *pReply)
 void CmdUserStats(EDF *pReply)
 {
    STACKTRACE
-   int iNumUsers = 0, iAccessLevel = LEVEL_NONE, iValue = 0, iDays = 0, iDate = 0, iMaxLogins = -1, iMaxLoginsDate = 0;
+   int iNumUsers = 0, iAccessLevel = LEVEL_NONE, iValue = 0, iDays = 0, iMaxLogins = -1, iMaxLoginsDate = 0;
    int iAll = 0, iAllTotal = 0, iAllAverage = 0;
    bool bRetro = false;
    // double dValue = 0;

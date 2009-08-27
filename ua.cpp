@@ -71,7 +71,7 @@ bool NameValid(const char *szName)
 }
 
 // AccessName: Convert numerical access level into character string
-char *AccessName(int iLevel, int iType)
+const char *AccessName(int iLevel, int iType)
 {
    if(iType != -1 && iType == USERTYPE_AGENT)
    {
@@ -102,7 +102,7 @@ char *AccessName(int iLevel, int iType)
    return "";
 }
 
-char *SubTypeStr(int iSubType)
+const char *SubTypeStr(int iSubType)
 {
 	STACKTRACE
    if(iSubType == SUBTYPE_EDITOR)

@@ -126,7 +126,7 @@ bool CmdTabMatch(int iType, EDF *pData, const char *szName, const char *szMatch,
 
    if(((bFull == true && stricmp(szName, szMatch) == 0) || (bFull == false && strnicmp(szName, szMatch, iMatchLen) == 0)) &&
       (iType == 1 || iType == 2 || iType == 3 ||
-      (iType == 4 && (mask(iUserType, USERTYPE_DELETED) == false && (mask(iStatus, LOGIN_ON) == true) || iNumShadows > 0)) ||
+      (iType == 4 && (mask(iUserType, USERTYPE_DELETED) == false && (mask(iStatus, LOGIN_ON) == true)) || iNumShadows > 0) ||
       (iType == 5 && (mask(iUserType, USERTYPE_DELETED) == false && mask(iUserType, USERTYPE_AGENT) == true && mask(iStatus, LOGIN_ON) == true)) ||
       (iType == 6 && mask(iServiceType, SERVICE_CONTACT) == true)
       ))
@@ -7660,7 +7660,7 @@ void AdminMenu()
    CmdSystemView(pSystem);
 
    // sprintf(szWrite, "Client:       \0373%s\0370 build \0373%d\0370, \0373%s %s\0370\n\n", CLIENT_NAME(), BUILDNUM, BUILDTIME, BUILDDATE);
-   sprintf(szWrite, "Client:       \0373%s\0370 build \0373%d\0370, \0373%s %s\0370 (PID \0373%lu\0370)\n", CLIENT_NAME(), BuildNum(), BuildTime(), BuildDate(), CmdPID());
+   sprintf(szWrite, "Client:       \0373%s\0370 build \0373%d\0370, \0373%s %s\0370 (PID \0373%lu\0370)\n", CLIENT_NAME(), BuildNum(), BuildTime(), BuildDate(), (long)CmdPID());
    CmdWrite(szWrite);
    sprintf(szWrite, "Server:       \0373%s\0370 (port \0373%d\0370", m_pClient->Hostname(), m_pClient->Port());
    if(m_pClient->GetSecure() == true)

@@ -358,9 +358,9 @@
 
 // Common functions
 bool NameValid(const char *szName);
-char *AccessName(int iLevel, int iType = -1);
+const char *AccessName(int iLevel, int iType = -1);
 
-char *SubTypeStr(int iSubType);
+const char *SubTypeStr(int iSubType);
 int SubTypeInt(const char *szSubType);
 int ProtocolVersion(const char *szVersion);
 int ProtocolCompare(const char *szVersion1, const char *szVersion2);

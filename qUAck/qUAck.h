@@ -52,8 +52,8 @@ extern EDF *m_pSystemList;
 extern EDFConn *m_pClient;
 
 int BuildNum();
-char *BuildTime();
-char *BuildDate();
+const char *BuildTime();
+const char *BuildDate();
 
 // int CmdServerVersion(const char *szVersion);
 

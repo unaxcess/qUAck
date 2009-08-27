@@ -100,12 +100,12 @@ int BuildNum()
    return BUILDNUM;
 }
 
-char *BuildTime()
+const char *BuildTime()
 {
    return BUILDTIME;
 }
 
-char *BuildDate()
+const char *BuildDate()
 {
    return BUILDDATE;
 }
