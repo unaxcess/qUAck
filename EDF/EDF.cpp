@@ -1243,8 +1243,8 @@ bool EDF::Iterate(const char *szIter, const char *szStop, const bool bMatch, con
 
          // No next iterate, move to one after parent
          if(szStop != NULL &&
-            (bMatch == true && stricmp(m_pCurr->getName(false), szStop) == 0) ||
-            (bMatch == false && strnicmp(m_pCurr->getName(false), szStop, iStopLen) == 0))
+            ((bMatch == true && stricmp(m_pCurr->getName(false), szStop) == 0) ||
+             (bMatch == false && strnicmp(m_pCurr->getName(false), szStop, iStopLen) == 0)))
          {
             bNext = true;
             bIter = false;
@@ -1255,8 +1255,8 @@ bool EDF::Iterate(const char *szIter, const char *szStop, const bool bMatch, con
 
             // bNext is false if we're at the root (this will trap NULL values of szStop)
             if(bNext == false || (szStop != NULL &&
-               (bMatch == true && stricmp(m_pCurr->getName(false), szStop) == 0) ||
-               (bMatch == false && strnicmp(m_pCurr->getName(false), szStop, iStopLen) == 0)))
+               ((bMatch == true && stricmp(m_pCurr->getName(false), szStop) == 0) ||
+                (bMatch == false && strnicmp(m_pCurr->getName(false), szStop, iStopLen) == 0))))
             {
                // Reached stop element
                bNext = true;
@@ -1424,10 +1424,11 @@ long EDF::Read(const byte *pData, const long lDataLen, const int iProgress, cons
 	int iDepth = 0, iNumElements = 0, iType = 0;
 	bool bLoop = true, bLiteral = false, bParent = false, bValid = true, bSingleton = false, bDepth = true, bRootSet = false, bFloat = false, bXMLType = true, bXML = true;
 	double dTick = gettick(), dBytesVal = 0, dNew = 0, dSpace = 0, dSet = 0, dName = 0, dValid = 0;
-	char *szName = NULL, *szParse = NULL;
+	char *szName = NULL;
 	byte *pPos = (byte *)pData, *pStop = pPos + lDataLen, *pStart = pPos, *pLine = pPos, *pParse = NULL, *pProgress = pPos, *pValue = NULL;
 	EDFElement *pOldRoot = m_pRoot, *pOldCurr = m_pCurr, *pElement = NULL, *pEDFRoot = NULL;
-	
+	const char *szParse = NULL;	
+
 	// if(m_bDebug == true)
 	{
 		debug(DEBUGLEVEL_DEBUG, "EDF::Read entry %p %ld %d\n", pData, lDataLen, iProgress);
