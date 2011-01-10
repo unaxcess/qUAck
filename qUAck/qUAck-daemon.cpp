@@ -518,8 +518,8 @@ bool ProxyHost(EDF *pEDF)
    STACKTRACE
    int iHostname = 0, iAddress = 0;
    socklen_t iSockLen = 0;
-   char szHostname[NI_MAXHOST], szAddress[NI_MAXSERV], pBuffer[BUFSIZ]; //, *szReturn = NULL;
-   struct sockaddr pSockAddr;
+   char szHostname[NI_MAXHOST], szAddress[NI_MAXHOST], pBuffer[BUFSIZ]; //, *szReturn = NULL;
+   struct sockaddr_storage pSockAddr;
 
    debug(DEBUGLEVEL_INFO, "ProxyHost entry %p\n", pEDF);
 
@@ -536,13 +536,13 @@ bool ProxyHost(EDF *pEDF)
       }
    }
 
-   mappedtov4(&pSockAddr);
+   mappedtov4((struct sockaddr *)&pSockAddr);
 
    szHostname[0] = '\0';
    szAddress[0] = '\0';
 
-   iHostname = getnameinfo(&pSockAddr, sizeof(struct sockaddr), szHostname, sizeof(szHostname), NULL, 0, NI_NAMEREQD);
-   iAddress = getnameinfo(&pSockAddr, sizeof(struct sockaddr), szAddress, sizeof(szAddress), NULL, 0, NI_NUMERICHOST);
+   iHostname = getnameinfo((struct sockaddr *)&pSockAddr, sizeof(struct sockaddr), szHostname, sizeof(szHostname), NULL, 0, NI_NAMEREQD);
+   iAddress = getnameinfo((struct sockaddr *)&pSockAddr, sizeof(struct sockaddr), szAddress, sizeof(szAddress), NULL, 0, NI_NUMERICHOST);
 
    debug(DEBUGLEVEL_INFO, "ProxyHost '%s'(%d) / '%s'(%d)\n", szHostname, iHostname, szAddress, iAddress);
 
