@@ -790,6 +790,12 @@ utmp *utmpscan(int iSession)
    {
       szTTY = ttyname(0);
       debug(DEBUGLEVEL_INFO, "utmpscan tty '%s'\n", szTTY);
+      if(strncmp(szTTY, "/dev/", 5) == 0)
+      {
+         szTTY += 5;
+      }
+      debug(DEBUGLEVEL_INFO, "utmpscan device '%s'\n", szTTY);
+      /*
       iTTYPos = strlen(szTTY);
       if(iTTYPos > 0)
       {
@@ -801,13 +807,15 @@ utmp *utmpscan(int iSession)
          szTTY = szTTY + iTTYPos;
          debug(DEBUGLEVEL_INFO, "utmpscan dev '%s'\n", szTTY);
       }
+      */
    }
 
 #ifndef NetBSD
 #ifndef CYGWIN
    while(bFound == false && (pEntry = getutent()) != NULL)
    {
-      if((iSession != -1 && pEntry->ut_pid == iSession) || (iSession == -1 && stricmp(szTTY, pEntry->ut_id) == 0))
+      debug(DEBUGLEVEL_INFO, "utmpscan entry %d %s %s\n", pEntry->ut_pid, pEntry->ut_line, pEntry->ut_host);
+      if((iSession != -1 && pEntry->ut_pid == iSession) || (iSession == -1 && stricmp(szTTY, pEntry->ut_line) == 0))
       {
          debug(DEBUGLEVEL_INFO, "utmpscan %d, '%s'\n", iSession, pEntry->ut_host);
 
@@ -841,21 +849,27 @@ bool ProxyHostEntry(EDF *pEDF, struct utmp *pEntry)
          debug(DEBUGLEVEL_DEBUG, "ProxyHostEntry parent connected from '%s' / '%s'\n", pEntry->ut_host, szAddress);
 
 #ifndef NetBSD
-         if(strcmp(pEntry->ut_host, szAddress) != 0)
+         if(ProtocolVersion("2.5") >= 0)
          {
-            pEDF->AddChild("hostname", pEntry->ut_host);
-            if(ProtocolVersion("2.5") >= 0)
+            if(strcmp(pEntry->ut_host, szAddress) != 0)
             {
-               pEDF->AddChild("address", szAddress);
+               debug(DEBUGLEVEL_DEBUG, "Adding hostname %s\n", pEntry->ut_host);
+               pEDF->AddChild("hostname", pEntry->ut_host);
             }
+            debug(DEBUGLEVEL_DEBUG, "Adding address %s\n", szAddress);
+            pEDF->AddChild("address", szAddress);
          }
          else if(ProtocolVersion("2.5") < 0)
          {
+            debug(DEBUGLEVEL_DEBUG, "Adding address %s\n", szAddress);
             pEDF->AddChild("hostname", szAddress);
          }
 #else
+         debug(DEBUGLEVEL_DEBUG, "Adding hostname %s\n", pEntry->ut_host);
          pEDF->AddChild("hostname", pEntry->ut_host);
 #endif
+
+         debugEDFPrint(DEBUGLEVEL_DEBUG, "ProxyHostEntry edited EDF", pEDF);
 
          delete[] szAddress;
       }
