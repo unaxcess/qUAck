@@ -24,7 +24,7 @@
 #include "CmdMenu.h"
 
 #define CLIENT_BASE "qUAck"
-#define CLIENT_VERSION "v0.96g"
+#define CLIENT_VERSION "v0.97"
 
 // Slight fudge for retro fit
 #define VOTE_FLOATVALUES 1024 // Added in v2.7-beta8
