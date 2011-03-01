@@ -2543,6 +2543,7 @@ CmdInput *CmdInputSetup(int iStatus)
             pInput->MenuAdd('a', "Archive message");
          }
          pInput->MenuAdd('c', "Close vote");
+		 pInput->MenuAdd('j', "Jump to message");
          pInput->MenuAdd('m', "Mass catch-up");
          if(CmdVersion("2.5") >= 0)
          {
@@ -3121,6 +3122,7 @@ bool CmdMessageRequest(int iFolderID, int iMessageID, bool bShowOnly, bool bPage
       {
          if(CmdYesNo("Message has been deleted. View anyway", false) == false)
          {
+			CmdMessageMark(-1, szFolderName, -1);
             bReturn = false;
          }
       }
@@ -8823,7 +8825,7 @@ void MessageMenu()
    char cOption = '\0';
    EDF *pRequest = NULL, *pReply = NULL, *pTemp = NULL, *pMessageIn, *pMessageOut = NULL;
 
-   while(cOption != 'x')
+   while(cOption != 'j' && cOption != 'x')
    {
       cOption = CmdMenu(MESSAGE);
       switch(cOption)
@@ -8875,6 +8877,23 @@ void MessageMenu()
          case 'f':
          case 's':
             MessageSearchMenu(-1, -1, true);
+            break;
+
+         case 'j':
+            // Jump to message
+            iMessageID = CmdLineNum("Message number");
+
+            if(iMessageID > 0)
+            {
+                if(CmdMessageRequest(-1, iMessageID) == true)
+                {
+                    FolderMenu(CmdCurrFolder(), CmdCurrMessage(), MSG_EXIT);
+                }
+				else
+                {
+                    CmdWrite("No such message\n");
+                }
+            }
             break;
 
          case 'm':
