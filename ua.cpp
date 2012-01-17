@@ -71,7 +71,7 @@ bool NameValid(const char *szName)
 }
 
 // AccessName: Convert numerical access level into character string
-const char *AccessName(int iLevel, int iType)
+char *AccessName(int iLevel, int iType)
 {
    if(iType != -1 && iType == USERTYPE_AGENT)
    {
@@ -102,7 +102,7 @@ const char *AccessName(int iLevel, int iType)
    return "";
 }
 
-const char *SubTypeStr(int iSubType)
+char *SubTypeStr(int iSubType)
 {
 	STACKTRACE
    if(iSubType == SUBTYPE_EDITOR)
@@ -140,10 +140,10 @@ int SubTypeInt(const char *szSubType)
    return -1;
 }
 
-int ProtocolVersion(const char *szVersion)
+/* int ProtocolVersion(const char *szVersion)
 {
    return ProtocolCompare(PROTOCOL, szVersion);
-}
+} */
 
 int ProtocolCompare(const char *szVersion1, const char *szVersion2)
 {

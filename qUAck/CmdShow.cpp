@@ -2075,9 +2075,9 @@ void CmdMessageView(EDF *pReply, int iFolderID, char *szFolderName, int iMsgNum,
    char cColour = '7';
    char szWrite[1000], *szFrom = NULL, *szTo = NULL, *szSubject = NULL, *szText = NULL, *szUserName = NULL;//, *szFromName = NULL;
    char szDate[100], *szReplyFolderName = NULL, *szSig = NULL, *szProxyFrom = NULL;
-   char *szType = NULL, *szNoteName = NULL, *szNote = NULL, *szUnits = NULL, *szVote = NULL, *szContent = NULL, *szMsgType = NULL;
+   char *szType = NULL, *szNoteName = NULL, *szNote = NULL, *szUnits = NULL, *szVote = NULL, *szContent = NULL, szMsgType[100];
    // struct tm *tmDate = NULL;
-   bool bRetro = false, bFirst = true, bRead = false, bSigFilter = false, bLoop = false, bPrevNote = false, bFiltered = false;
+   bool bRetro = false, bFirst = true, bRead = false, bSigFilter = false, bLoop = false, bPrevNote = false, bFiltered = false, bSaved = false;
    bool bSlimHeaders = false;
 
    // debug("CmdMessageView entry\n");
@@ -2091,6 +2091,7 @@ void CmdMessageView(EDF *pReply, int iFolderID, char *szFolderName, int iMsgNum,
    pReply->Get(NULL, &iMsgID);
    // pReply->GetChild("msgpos", &iMsgNum);
    bRead = pReply->GetChildBool("read");
+   bSaved = pReply->GetChildBool("saved");
    pReply->GetChild("marktype", &iMarkType);
    pReply->GetChild("msgtype", &iMsgType);
 
@@ -2104,38 +2105,39 @@ void CmdMessageView(EDF *pReply, int iFolderID, char *szFolderName, int iMsgNum,
       m_pUser->Parent();
    }
 
+   szMsgType[0] = '\0';
    if(mask(iMsgType, MSGTYPE_DELETED) == true)
    {
       if(bSlimHeaders == true)
       {
-         szMsgType = "\0371** DELETED **\0370";
+         strcat(szMsgType, "\0371** DELETED **\0370");
       }
       else
       {
-         szMsgType = " [\0371** DELETED **\0370]";
+         strcat(szMsgType, " [\0371** DELETED **\0370]");
       }
    }
    else if(bRead == true)
    {
       if(bSlimHeaders == true)
       {
-         szMsgType = "+";
+         strcat(szMsgType, "+");
       }
       else
       {
          if(iMarkType == THREAD_CHILD || iMarkType == THREAD_MSGCHILD)
          {
-            szMsgType = " [Caught-up]";
+            strcat(szMsgType, " [Caught-up]");
          }
          else
          {
-            szMsgType = " [Re-read]";
+            strcat(szMsgType, " [Re-read]");
          }
+		 if(bSaved == true)
+		 {
+			 strcat(szMsgType, " [Saved]");
+		 }
       }
-   }
-   else
-   {
-      szMsgType = "";
    }
 
    pReply->GetChild("date", &iDate);

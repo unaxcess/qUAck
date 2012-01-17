@@ -91,6 +91,7 @@ CmdInput *CmdInputSetup(int iStatus);
 void FolderMenu(int iFolderID, int iMessageID, int iMsgPos);
 void ContentMenu(EDF *pEDF, const char *szType, int iID);
 bool MessageMarkMenu(bool bAdd, int iFolderID = -1, int iMessageID = -1, int iFromID = -1, const char *szSubject = NULL, bool bMinCheck = false);
+int MessageSearchResultsMenu(EDF *pRequest);
 bool UserEditMenu(int iEditID);
 bool PageMenu(EDF *pPage, bool bBell);
 void BulletinMenu(bool bShowAll);

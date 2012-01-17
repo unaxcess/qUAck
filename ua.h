@@ -16,10 +16,10 @@
 #ifndef _UA_H_
 #define _UA_H_
 
-// Protocol
-#define PROTOCOL "2.6-beta17"
-
 // MessageSpec start
+
+// Protocol
+#define PROTOCOL "2.9-beta1"
 
 // String lengths (UA_ prefix introduced in v2.4-beta8 due to conflicts with MySQL)
 #define UA_NAME_LEN 20
@@ -81,6 +81,8 @@
 #define FOLDERMODE_MEM_SDEL 64
 #define FOLDERMODE_MEM_ADEL 128
 #define FOLDERMODE_MEM_MOVE 1024
+#define FOLDERMODE_CONTENT 2048 // Added in v2.7-alpha
+#define FOLDERMODE_PERSIST 4096 // Added in v2.7-alpha
 
 #define FOLDERMODE_NORMAL ACCMODE_SUB_READ + ACCMODE_SUB_WRITE + FOLDERMODE_SUB_SDEL
 #define FOLDERMODE_RESTRICTED ACCMODE_MEM_READ + ACCMODE_MEM_WRITE + FOLDERMODE_MEM_SDEL
@@ -145,6 +147,8 @@
 #define VOTE_INTVALUES 128 // Added in v2.6-beta16
 #define VOTE_PERCENT 256 // Added in v2.6-beta16
 #define VOTE_STRVALUES 512 // Added in v2.6-beta16
+#define VOTE_FLOATVALUES 1024 // Added in v2.7-beta8
+#define VOTE_FLOATPERCENT 2048 // Added in v2.7-beta8
 
 // Message attachment types
 #define MSGATT_EDF "text/x-edf"
@@ -191,6 +195,10 @@
 #define TASK_WEEKDAY 2
 #define TASK_WEEKEND 3
 #define TASK_WEEKLY 4
+
+// Message archiving (added in v2.7-beta7)
+#define ARCHIVE_PUBLIC 1
+#define ARCHIVE_PRIVATE 2
 
 // Service actions (added in v2.6-beta2)
 #define ACTION_LIST "list"
@@ -264,7 +272,13 @@
 #define MSG_MESSAGE_MOVE "message_move"
 #define MSG_MESSAGE_MARK_READ "message_mark_read"
 #define MSG_MESSAGE_MARK_UNREAD "message_mark_unread"
+#define MSG_MESSAGE_MARK_SAVE "message_mark_save" // Added in v2.9-alpha
+#define MSG_MESSAGE_MARK_UNSAVE "message_mark_unsave" // Added in v2.9-alpha
 #define MSG_MESSAGE_VOTE "message_vote"
+#define MSG_CONTENT_ADD "content_add" // Added in v2.7-alpha
+#define MSG_CONTENT_DELETE "content_delete" // Added in v2.7-alpha
+#define MSG_CONTENT_EDIT "content_edit" // Added in v2.7-alpha
+#define MSG_CONTENT_LIST "content_list" // Added in v2.7-alpha
 
 #define MSG_CHANNEL_ADD "channel_add"
 #define MSG_CHANNEL_DELETE "channel_delete"
@@ -322,6 +336,9 @@
 // #define MSG_MESSAGE_VOTE_INVALID "message_vote_invalid" // Deprecated in v2.5-beta3, use MSG_MESSAGE_ACCESS_INVALID
 #define MSG_MESSAGE_ACCESS_INVALID "message_access_invalid"
 
+#define MSG_CONTENT_NOT_EXIST "content_not_exist" // Added in v2.7-alpha
+#define MSG_CONTENT_ACCESS_INVALID "content_access_invalid" // Added in v2.7-alpha
+
 #define MSG_CHANNEL_NOT_EXIST "channel_not_exist"
 #define MSG_CHANNEL_EXIST "channel_exist"
 // #define MSG_CHANNEL_INVALID "channel_invalid" // Deprecated in v2.5-alpha
@@ -350,19 +367,22 @@
 
 // MessageSpec stop
 
-/* #define IS_NUM_VOTE(x) \
+#define IS_INT_VOTE(x) \
 (mask(x, VOTE_INTVALUES) == true || mask(x, VOTE_PERCENT) == true)
 
+#define IS_FLOAT_VOTE(x) \
+(mask(x, VOTE_FLOATVALUES) == true || mask(x, VOTE_FLOATPERCENT) == true)
+
 #define IS_VALUE_VOTE(x) \
-(IS_NUM_VOTE(x) || mask(x, VOTE_STRVALUES) == true) */
+(IS_INT_VOTE(x) == true || IS_FLOAT_VOTE(x) == true || mask(x, VOTE_STRVALUES) == true)
 
 // Common functions
 bool NameValid(const char *szName);
-const char *AccessName(int iLevel, int iType = -1);
+char *AccessName(int iLevel, int iType = -1);
 
-const char *SubTypeStr(int iSubType);
+char *SubTypeStr(int iSubType);
 int SubTypeInt(const char *szSubType);
-int ProtocolVersion(const char *szVersion);
+// int ProtocolVersion(const char *szVersion);
 int ProtocolCompare(const char *szVersion1, const char *szVersion2);
 
 #endif

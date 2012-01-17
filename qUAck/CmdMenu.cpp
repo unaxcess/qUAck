@@ -2544,6 +2544,10 @@ CmdInput *CmdInputSetup(int iStatus)
          }
          pInput->MenuAdd('c', "Close vote");
 		 pInput->MenuAdd('j', "Jump to message");
+         if(CmdVersion("2.9") >= 0)
+         {
+            pInput->MenuAdd('l', "saved List");
+         }
          pInput->MenuAdd('m', "Mass catch-up");
          if(CmdVersion("2.5") >= 0)
          {
@@ -2623,13 +2627,20 @@ CmdInput *CmdInputSetup(int iStatus)
    return pInput;
 }
 
-char CmdMessageInput(CmdInput *pInput, bool bMessage, bool bThread, bool bWhole, bool bReplies, bool bCrossFolder, bool bFrom, bool bTo, bool bSubject, bool bKeyword, char cDefault)
+char CmdMessageInput(CmdInput *pInput, bool bMessage, bool bSave, bool bThread, bool bWhole, bool bReplies, bool bCrossFolder, bool bFrom, bool bTo, bool bSubject, bool bKeyword, char cDefault)
 {
    char cOption = '\0';
 
-   if(bMessage == true)
+   if(bSave == true)
    {
-      pInput->MenuAdd('m', "Message");
+	   pInput->MenuAdd('m', "save Message");
+   }
+   else
+   {
+	   if(bMessage == true)
+	   {
+		  pInput->MenuAdd('m', "Message");
+	   }
    }
    if(bThread == true)
    {
@@ -3210,7 +3221,7 @@ bool CmdMessageRequest(int iFolderID, int iMessageID, bool bShowOnly, bool bPage
    return bReturn;
 }
 
-int MessageSearchMenu(int iFolderID, int iUserID, bool bFreeForm)
+int MessageSearchMenu(int iFolderID, int iUserID, bool bFreeForm, bool bSaved)
 {
    STACKTRACE
    int iListType = 0, iFolderEDF = -1, iMessageID = -1, iNumMsgs = 0, iColourLen = 0, iSearchType = 1;
@@ -3244,6 +3255,10 @@ int MessageSearchMenu(int iFolderID, int iUserID, bool bFreeForm)
       {
          bRequest = false;
       }
+   }
+   else if(bSaved == true)
+   {
+	   pRequest->SetChild("saved", true);
    }
    else
    {
@@ -3282,7 +3297,7 @@ int MessageSearchMenu(int iFolderID, int iUserID, bool bFreeForm)
             pInput->MenuAdd('u', "Unread");
             pInput->MenuAdd('v', "Votes");
          }
-         cOption = CmdMessageInput(pInput, false, false, false, false, false, true, true, iFolderID != -1, true, iFolderID != -1 ? 's' : 'x');
+         cOption = CmdMessageInput(pInput, false, false, false, false, false, false, true, true, iFolderID != -1, true, iFolderID != -1 ? 's' : 'x');
          if(cOption == 'x')
          {
             delete pRequest;
@@ -3624,7 +3639,7 @@ bool MessageMoveMenu(int iFolderID, int iMessageID, int iMessageTop)
    debug("MessageMoveMenu %d %d %d\n", iFolderID, iMessageID, iMessageTop);
 
    pInput = new CmdInput(0, "Move");
-   cOption = CmdMessageInput(pInput, true, true, true, true, true, false, false, false, false, 'x');
+   cOption = CmdMessageInput(pInput, true, false, true, true, true, true, false, false, false, false, 'x');
    if(cOption == 'x')
    {
       return false;
@@ -3716,11 +3731,11 @@ bool MessageDeleteMenu(int iFolderID, int iMessageID, int iMessageTop, bool bAtt
    }
    if(iAccessLevel >= LEVEL_WITNESS || iSubType == SUBTYPE_EDITOR)
    {
-      cOption = CmdMessageInput(pInput, true, true, true, true, true, false, false, false, false, 'x');
+      cOption = CmdMessageInput(pInput, true, false, true, true, true, true, false, false, false, false, 'x');
    }
    else
    {
-      cOption = CmdMessageInput(pInput, true, false, false, false, false, false, false, false, false, 'x');
+      cOption = CmdMessageInput(pInput, true, false, false, false, false, false, false, false, false, false, 'x');
    }
    if(cOption == 'x')
    {
@@ -3792,7 +3807,7 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
    int iMarkType = 0, iNumMarked = 0, iNumUnread = 0, iNumMsgs = 0;
    int iMinCatchup = 2000, iSubType = 0, iAccessMode, iTotalUnread = 0, iValue = 0, iEndDate = -1, iTotalMarked = 0;
    int iFolderMessage = -1, iFolderUnread = 0;
-   bool bLoop = false, bRefresh = false, bMarkKeep = false;
+   bool bLoop = false, bRefresh = false, bMarkKeep = false, bSave = false;
    char cOption = '\0';
    char szWrite[100];
    char *szValue = NULL, *szOption = NULL, *szFolderName = NULL;
@@ -3869,13 +3884,14 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
    {
       pInput->MenuAdd('u', "Until today");
    }
+   bSave = CmdVersion("2.9") >= 0 && bAdd == false;
    if(iMessageID != -1)
    {
-      cOption = CmdMessageInput(pInput, bAdd == false, true, true, true, false, iFolderID != -1, false, true, false, bAdd == false ? 'm' : 'x');
+      cOption = CmdMessageInput(pInput, bAdd == false, bSave, true, true, true, false, iFolderID != -1, false, true, false, bAdd == false ? 'm' : 'x');
    }
    else
    {
-      cOption = CmdMessageInput(pInput, false, false, false, false, false, iFolderID != -1, false, false, false, bAdd == false ? 'm' : 'x');
+      cOption = CmdMessageInput(pInput, false, false, false, false, false, false, iFolderID != -1, false, false, false, bAdd == false ? 'm' : 'x');
    }
    if(cOption == 'x')
    {
@@ -4051,7 +4067,23 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
          {
             debugEDFPrint("MessageMarkMenu request", pRequest);
          }
-         CmdRequest(bAdd == true ? MSG_MESSAGE_MARK_READ : MSG_MESSAGE_MARK_UNREAD, pRequest, &pReply);
+		 char *szRequest = NULL;
+		 if(bSave == true)
+		 {
+			 szRequest = MSG_MESSAGE_MARK_SAVE;
+		 }
+		 else
+		 {
+			 if(bAdd == true)
+			 {
+				szRequest = MSG_MESSAGE_MARK_READ;
+			 }
+			 else
+			 {
+				 szRequest = MSG_MESSAGE_MARK_UNREAD;
+			 }
+		 }
+         CmdRequest(szRequest, pRequest, &pReply);
          if(CmdVersion("2.5") >= 0)
          {
             debugEDFPrint("MessageMarkMenu reply", pReply);
@@ -4075,23 +4107,39 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
                   pReply->GetChild("nummsgs", &iNumMsgs);
                   sprintf(szWrite, "%s of \0374%d\0370", szWrite, iNumMsgs);
                }
+			   char *szMarkWord = NULL;
+				 if(bSave == true)
+				 {
+					 szMarkWord = "saved";
+				 }
+				 else
+				 {
+					 if(bAdd == true)
+					 {
+						szMarkWord = "read";
+					 }
+					 else
+					 {
+						 szMarkWord = "unread";
+					 }
+				 }
                sprintf(szWrite, "%s messages marked as %s\n", szWrite, bAdd == true ? "read" : "unread");
                CmdWrite(szWrite);
 
-               m_pMessageList->Root();
-               bLoop = m_pMessageList->Child("message");
-               while(bLoop == true)
-               {
-                  if(bAdd == true && m_pMessageList->GetChildBool("read") == false)
-                  {
-                     m_pMessageList->SetChild("read", true);
-                  }
-                  else if(bAdd == false && m_pMessageList->GetChildBool("read") == true)
-                  {
-                     m_pMessageList->DeleteChild("read");
-                  }
-                  bLoop = m_pMessageList->Iterate("message");
-               }
+				m_pMessageList->Root();
+				bLoop = m_pMessageList->Child("message");
+				while(bLoop == true)
+				{
+					if(bAdd == true && m_pMessageList->GetChildBool("read") == false)
+					{
+						m_pMessageList->SetChild("read", true);
+					}
+					else if(bAdd == false && m_pMessageList->GetChildBool("read") == true)
+					{
+						m_pMessageList->DeleteChild("read");
+					}
+					bLoop = m_pMessageList->Iterate("message");
+				}
             }
 
             if(bAdd == true)
@@ -4109,68 +4157,71 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
 
             // printf("MessageMarkMenu pre-mark unread %d\n", iNumUnread);
 
-            bLoop = pReply->Child("messageid");
-            while(bLoop == true)
-            {
-               szFolderName = NULL;
+			if(bSave == false)
+			{
+				bLoop = pReply->Child("messageid");
+				while(bLoop == true)
+				{
+				   szFolderName = NULL;
 
-               if(pReply->GetChildBool("action", true) == true)
-               {
-                  pReply->Get(NULL, &iMessageID);
-                  if(pReply->GetChild("folderid", &iFolderMessage) == true && iFolderMessage != iFolderID)
-                  {
-                     pReply->GetChild("foldername", &szFolderName);
+				   if(pReply->GetChildBool("action", true) == true)
+				   {
+					  pReply->Get(NULL, &iMessageID);
+					  if(pReply->GetChild("folderid", &iFolderMessage) == true && iFolderMessage != iFolderID)
+					  {
+						 pReply->GetChild("foldername", &szFolderName);
 
-                     m_pFolderList->TempMark();
-                     if(FolderGet(m_pFolderList, iFolderMessage) == true)
-                     {
-                        m_pFolderList->GetChild("unread", &iFolderUnread);
-                        if(bAdd == true)
-                        {
-                           iFolderUnread--;
-                        }
-                        else
-                        {
-                           iFolderUnread++;
-                        }
-                        if(iFolderUnread >= 0)
-                        {
-                           m_pFolderList->SetChild("unread", iFolderUnread);
-                        }
-                     }
-                     m_pFolderList->TempUnmark();
-                  }
-                  else
-                  {
-                     m_pMessageList->Root();
-                     if(MessageInFolder(m_pMessageList, iMessageID) == true)
-                     {
-                        if(bAdd == true && m_pMessageList->GetChildBool("read") == false)
-                        {
-                           m_pMessageList->SetChild("read", true);
-                           iNumUnread--;
-                        }
-                        else if(bAdd == false && m_pMessageList->GetChildBool("read") == true)
-                        {
-                           m_pMessageList->DeleteChild("read");
-                           iNumUnread++;
-                        }
-                     }
-                  }
+						 m_pFolderList->TempMark();
+						 if(FolderGet(m_pFolderList, iFolderMessage) == true)
+						 {
+							m_pFolderList->GetChild("unread", &iFolderUnread);
+							if(bAdd == true)
+							{
+							   iFolderUnread--;
+							}
+							else
+							{
+							   iFolderUnread++;
+							}
+							if(iFolderUnread >= 0)
+							{
+							   m_pFolderList->SetChild("unread", iFolderUnread);
+							}
+						 }
+						 m_pFolderList->TempUnmark();
+					  }
+					  else
+					  {
+						 m_pMessageList->Root();
+						 if(MessageInFolder(m_pMessageList, iMessageID) == true)
+						 {
+							if(bAdd == true && m_pMessageList->GetChildBool("read") == false)
+							{
+							   m_pMessageList->SetChild("read", true);
+							   iNumUnread--;
+							}
+							else if(bAdd == false && m_pMessageList->GetChildBool("read") == true)
+							{
+							   m_pMessageList->DeleteChild("read");
+							   iNumUnread++;
+							}
+						 }
+					  }
 
-                  sprintf(szWrite, "Message \0374%d\0370", iMessageID);
-                  if(szFolderName != NULL)
-                  {
-                     sprintf(szWrite, "%s in \0374%s\0370", szWrite, szFolderName);
-                  }
-                  sprintf(szWrite, "%s marked as %s\n", szWrite, bAdd == true ? "read" : "unread");
-                  CmdWrite(szWrite);
+					  sprintf(szWrite, "Message \0374%d\0370", iMessageID);
+					  if(szFolderName != NULL)
+					  {
+						 sprintf(szWrite, "%s in \0374%s\0370", szWrite, szFolderName);
+					  }
+					  sprintf(szWrite, "%s marked as %s\n", szWrite, bAdd == true ? "read" : "unread");
+					  CmdWrite(szWrite);
 
-                  delete[] szFolderName;
-               }
+					  delete[] szFolderName;
+				   }
 
-               bLoop = pReply->Next("messageid");
-            }
+				   bLoop = pReply->Next("messageid");
+				}
+			}
          }
 
          debug(DEBUGLEVEL_DEBUG, "MessageMarkMenu resetting unread folder list count to %d\n", iNumUnread);
@@ -4807,7 +4858,7 @@ void FolderMenu(int iFolderID, int iMessageID, int iMsgPos)
             break;
 
          case 's':
-            MessageSearchMenu(CmdCurrFolder(), m_iFromID, false);
+            MessageSearchMenu(CmdCurrFolder(), m_iFromID, false, false);
             break;
 
          case 't':
@@ -8876,7 +8927,7 @@ void MessageMenu()
 
          case 'f':
          case 's':
-            MessageSearchMenu(-1, -1, true);
+            MessageSearchMenu(-1, -1, true, false);
             break;
 
          case 'j':
@@ -8894,6 +8945,10 @@ void MessageMenu()
                     CmdWrite("No such message\n");
                 }
             }
+            break;
+
+         case 'l':
+            MessageSearchMenu(-1, -1, false, true);
             break;
 
          case 'm':
