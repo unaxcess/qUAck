@@ -110,10 +110,10 @@ const char *BuildDate()
    return BUILDDATE;
 }
 
-/* int ProtocolVersion(const char *szVersion)
+int ProtocolVersion(const char *szVersion)
 {
-   return ProcotolCompare(PROTOCOL, szVersion);
-} */
+   return ProtocolCompare(PROTOCOL, szVersion);
+}
 
 // Perform emergency shutdown on program error
 void Panic(int iSignal)

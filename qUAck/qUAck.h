@@ -56,6 +56,7 @@ const char *BuildTime();
 const char *BuildDate();
 
 // int CmdServerVersion(const char *szVersion);
+int ProtocolVersion(const char *szVersion);
 
 char *CLIENT_NAME();
 char *CLIENT_SUFFIX();
