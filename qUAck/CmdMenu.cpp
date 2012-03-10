@@ -6995,15 +6995,16 @@ void FolderListMenu()
    EDF *pRequest = NULL, *pReply = NULL;
    CmdInput *pInput = NULL;
 
+   m_pUser->Root();
+   m_pUser->GetChild("accesslevel", &iAccessLevel);
+
    pInput = new CmdInput(CMD_MENU_NOCASE, "Folders");
    pInput->MenuAdd('u', "Unread");
    pInput->MenuAdd('s', "Subscribed", NULL, true);
    pInput->MenuAdd('a', "All");
    pInput->MenuAdd('n', "uNsubscribed");
+   pInput->MenuAdd('d', "all including Deleted");
    pInput->MenuAdd('x', "eXit");
-
-   m_pUser->Root();
-   m_pUser->GetChild("accesslevel", &iAccessLevel);
 
    cOption = CmdMenu(pInput);
    if(cOption != 'x')
@@ -7029,6 +7030,11 @@ void FolderListMenu()
 
          case 'n':
             iListType = 1;
+            iSearchType = 2;
+            break;
+
+         case 'd':
+            iListType = 4;
             iSearchType = 2;
             break;
       }

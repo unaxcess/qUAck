@@ -1258,6 +1258,7 @@ void CmdHelpView(EDF *pReply)
 ** 1 - Unsubscribed
 ** 2 - Subscribed
 ** 3 - Unread
+** 4 - Include deleted
 **
 ** listdetails: Details option
 ** 0 - None
@@ -1322,7 +1323,7 @@ void CmdMessageTreeList(EDF *pReply, const char *szType, int iListType, int iLis
       bLoop = pReply->Child(szType);
       while(bLoop == true)
       {
-         if(pReply->GetChildBool("deleted") == false)
+         if(pReply->GetChildBool("deleted") == false || iListType == 4)
          {
             iSubType = 0;
             iNumUnread = 0;
