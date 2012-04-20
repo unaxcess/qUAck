@@ -2631,16 +2631,13 @@ char CmdMessageInput(CmdInput *pInput, bool bMessage, bool bSave, bool bThread, 
 {
    char cOption = '\0';
 
+   if(bMessage == true)
+   {
+      pInput->MenuAdd('m', "Message");
+   }
    if(bSave == true)
    {
-	   pInput->MenuAdd('m', "save Message");
-   }
-   else
-   {
-	   if(bMessage == true)
-	   {
-		  pInput->MenuAdd('m', "Message");
-	   }
+      pInput->MenuAdd('v', "saVe");
    }
    if(bThread == true)
    {
@@ -3906,6 +3903,16 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
       }
    }
 
+   char *szRequest = NULL;
+   if(bAdd == true)
+   {
+      szRequest = MSG_MESSAGE_MARK_READ;
+   }
+   else
+   {
+      szRequest = MSG_MESSAGE_MARK_UNREAD;
+   }
+
    switch(cOption)
    {
       case 'a':
@@ -4009,6 +4016,10 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
          iEndDate -= 60 * tmTime->tm_min;
          iEndDate -= tmTime->tm_sec;
          break;
+         
+      case 'v':
+         szRequest = MSG_MESSAGE_MARK_SAVE;
+         break;
 
       default:
          debug(DEBUGLEVEL_WARN, "MessageMarkMenu no action for %c\n", cOption);
@@ -4067,22 +4078,6 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
          {
             debugEDFPrint("MessageMarkMenu request", pRequest);
          }
-		 char *szRequest = NULL;
-		 if(bSave == true)
-		 {
-			 szRequest = MSG_MESSAGE_MARK_SAVE;
-		 }
-		 else
-		 {
-			 if(bAdd == true)
-			 {
-				szRequest = MSG_MESSAGE_MARK_READ;
-			 }
-			 else
-			 {
-				 szRequest = MSG_MESSAGE_MARK_UNREAD;
-			 }
-		 }
          CmdRequest(szRequest, pRequest, &pReply);
          if(CmdVersion("2.5") >= 0)
          {
@@ -4108,7 +4103,7 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
                   sprintf(szWrite, "%s of \0374%d\0370", szWrite, iNumMsgs);
                }
 			   char *szMarkWord = NULL;
-				 if(bSave == true)
+				 if(strcmp(szRequest, MSG_MESSAGE_MARK_SAVE) == 0)
 				 {
 					 szMarkWord = "saved";
 				 }
