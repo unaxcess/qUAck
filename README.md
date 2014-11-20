@@ -83,14 +83,10 @@ qUAck looks the way it does as a result of 10 years UI "refinement" beginning
 with old UNaXcess (circa 1984) and continuing until 1999 when we [the Manc CS
 UA bods] were dragged kicking and screaming onto UNaXcess II
 
-Old UA guilty parties: Brandon S Allbery, Andrew G Minter, Rob Partington,
-Gryn Davies, Michael Wood, Andrew Armitage, Francis Cook, Brian Widdas
+Old UA guilty parties: Brandon S Allbery, Andrew G Minter, Phaedrus,
+Gryn, Techno, Laughter, Fran, BW
 
-Special mention to Jason Williams (Khendon) and Tim Bannister (isoma) - my
-favourite beta testers ever - who put up with bugs, compilation problems and
-a host of other obstacles to help me fix things before public release,
-Rob Partington (Phaedrus) for providing patches and using the exact opposite
-of all my settings and forcing me to fix all the code I never see or use,
-David Walters for his first time user suggestions.
+Special mention to Khendon and isoma - my favourite beta testers ever - who put up with bugs, compilation problems and
+a host of other obstacles to help me fix things before public release, Phaedrus for providing patches and using the exact opposite of all my settings and forcing me to fix all the code I never see or use, David for his first time user suggestions.
 
 Enjoy!
