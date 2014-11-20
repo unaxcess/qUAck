@@ -2,17 +2,15 @@ qUAck - Telnet look and feel client for UNaXcess II
 ===================================================
 
 FAQ
----
+===
 
-Q: It doesn't compile
-A: Probably the carriage return / line feed thing. Try this:
+*It doesn't compile*
+Probably the carriage return / line feed thing. Try this:
 
-   perl -pli~ -e 's/^V^M//' Makefile* */Makefile useful/useful.h useful/useful.cpp qUAck/CmdIO.cpp qUAck/qUAck.h EDF/EDF.cpp EDF/EDFElement.[ch]* Conn/Conn.cpp
+`perl -pli~ -e 's/^V^M//' Makefile* */Makefile useful/useful.h useful/useful.cpp qUAck/CmdIO.cpp qUAck/qUAck.h EDF/EDF.cpp EDF/EDFElement.[ch]* Conn/Conn.cpp`
 
-Q: How do I configure it?
-A: Under Unix you can put configuration options in a .qUAckrc file in your
-   home directory. Under Windows put them in a qUAck.edf file in the same
-   directory as the executable. Here's an example:
+*How do I configure it?*
+Under Unix you can put configuration options in a .qUAckrc file in your home directory. Under Windows put them in a qUAck.edf file in the same directory as the executable. Here's an example:
    
    <>
      <server="localhost"/>
@@ -72,21 +70,16 @@ A: Under Unix you can put configuration options in a .qUAckrc file in your
    
    Append the PID to the filename qUAck puts debug information into
    
-
-Q: Backspace / delete / etc doesn't work in the editor (Unix)
-A: Your version of curses is broken :-)
+*Backspace / delete / etc doesn't work in the editor (Unix)*
+Your version of curses is broken :-)
 
 Credits
--------
+=======
 
-qUAck looks the way it does as a result of 10 years UI "refinement" beginning
-with old UNaXcess (circa 1984) and continuing until 1999 when we [the Manc CS
-UA bods] were dragged kicking and screaming onto UNaXcess II
+qUAck looks the way it does as a result of 10 years UI "refinement" beginning with old UNaXcess (circa 1984) and continuing until 1999 when we [the Manc CS UA bods] were dragged kicking and screaming onto UNaXcess II
 
-Old UA guilty parties: Brandon S Allbery, Andrew G Minter, Phaedrus,
-Gryn, Techno, Laughter, Fran, BW
+Old UA guilty parties: Brandon S Allbery, Andrew G Minter, Phaedrus, Gryn, Techno, Laughter, Fran, BW
 
-Special mention to Khendon and isoma - my favourite beta testers ever - who put up with bugs, compilation problems and
-a host of other obstacles to help me fix things before public release, Phaedrus for providing patches and using the exact opposite of all my settings and forcing me to fix all the code I never see or use, David for his first time user suggestions.
+Special mention to Khendon and isoma - my favourite beta testers ever - who put up with bugs, compilation problems and a host of other obstacles to help me fix things before public release, Phaedrus for providing patches and using the exact opposite of all my settings and forcing me to fix all the code I never see or use, David for his first time user suggestions.
 
 Enjoy!
