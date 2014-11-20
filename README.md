@@ -1,12 +1,6 @@
 qUAck - Telnet look and feel client for UNaXcess II
 ===================================================
 
-Links
------
-
-Public version -      http://ua2.org/clients/
-Development version - http://ua2.org/UADN/
-
 FAQ
 ---
 
