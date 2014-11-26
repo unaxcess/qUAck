@@ -4,7 +4,7 @@
 # Build file for sub directories (delete as appropriate)
 
 all:
-		cd qUAck ; make ../bin/qUAck
+		cd qUAck ; make all
 
 clean:
 		cd qUAck ; make clean

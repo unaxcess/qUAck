@@ -67,7 +67,7 @@ cat << EOF
 CC=g++
 CCSECURE=-DCONNSECURE
 INCCCFLAGS=-g -Wall -O2 -DUNIX -D$arch -DSTACKTRACEON -I..
-CCFLAGS=\$(INCCCFLAGS) \$(CCSECURE)
+CCFLAGS=\$(INCCCFLAGS) \$(CCSECURE) -Wno-write-strings
 
 LD=g++
 LDSECURE=-lssl -lcrypto
