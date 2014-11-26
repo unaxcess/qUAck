@@ -5,12 +5,12 @@ class UA2Quack < FPM::Cookery::Recipe
     description 'UA Server'
     maintainer  'Jon Topper <jon@scalefactory.com>'
     vendor      'fpm'
-    revision    0
+    version     '1.1'
 
-    if ENV.has_key?('PKG_VERSION')
-        version ENV['PKG_VERSION']
+    if ENV.has_key?('PKG_REVISION')
+        revision ENV['PKG_REVISION']
     else
-        raise 'No PKG_VERSION passed in the environment'
+        raise 'No PKG_REVISION passed in the environment'
     end
 
     def build
