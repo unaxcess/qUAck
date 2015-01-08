@@ -612,8 +612,16 @@ bool CmdRefreshMessages(int iFolderID, bool bIdleReset)
    pRequest->AddChild("searchtype", CmdVersion("2.3") >= 0 ? 3 : 1);
    if(mask(iAccessMode, ACCMODE_PRIVATE) == true)
    {
+      if(CmdVersion("2.7") >= 0)
+      {
+         pRequest->Add("or");
+      }
       pRequest->AddChild("toid", iUserID);
       pRequest->AddChild("fromid", iUserID);
+      if(CmdVersion("2.7") >= 0)
+      {
+         pRequest->Parent();
+      }
    }
 
    // EDFPrint("CmdRefreshMessages request", pRequest);
