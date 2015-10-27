@@ -9098,7 +9098,6 @@ void GameMenu()
    char cOption = '\0';
    char szWrite[200];
    char *szName = NULL, *szContentType = NULL;
-   CmdInput *pInput = NULL;
    EDF *pOptions = NULL;
    Game *pTemp = NULL;
 
