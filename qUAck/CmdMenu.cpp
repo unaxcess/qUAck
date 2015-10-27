@@ -4511,7 +4511,7 @@ void FolderMenu(int iFolderID, int iMessageID, int iMsgPos)
 {
    STACKTRACE
    int iUserID = 0, iAccessLevel = LEVEL_NONE, iInitPos = 0, iVoteType = 0, iFromID = -1, iVoteID = 0;
-   int iAccessMode = FOLDERMODE_NORMAL, iStatus = LOGIN_OFF, iRetro = 0, iConfirm = 0, iMessageTop = 0, iValue = 0;
+   int iAccessMode = FOLDERMODE_NORMAL, iStatus = LOGIN_OFF, iRetro = 0, iConfirm = 0, iMessageTop = 0;
    bool bLoop = true, bAction = false, bRetro = false, bOldMenus = false, bValid = false;
    char cOption = '\0', szWrite[100], szFilename[100];
    char *szFolderName = NULL, *szOption = NULL, *szValue = NULL, *szUsername = NULL, *szFromName = NULL, *szSubject = NULL;
