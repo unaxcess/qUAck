@@ -10,6 +10,8 @@ Probably the carriage return / line feed thing. Try this:
 perl -pli~ -e 's/^V^M//' Makefile* */Makefile useful/useful.h useful/useful.cpp qUAck/CmdIO.cpp qUAck/qUAck.h EDF/EDF.cpp EDF/EDFElement.[ch]* Conn/Conn.cpp
 ```
 
+Also check that you have installed all the dependencies (see list below).
+
 ### How do I configure it?
 
 Under Unix you can put configuration options in a .qUAckrc file in your home directory. Under Windows put them in a qUAck.edf file in the same directory as the executable. Here's an example:
@@ -92,6 +94,13 @@ Append the PID to the filename qUAck puts debug information into
 ### Backspace / delete / etc doesn't work in the editor (Unix)
 
 Your version of curses is broken :-)
+
+## Dependencies
+
+The following dependencies are required for compilation:
+
+ * OpenSSL headers - `libssl-dev` in Debian.
+ * ncurses headers - `libncurses5-dev` in Debian.
 
 ## Credits
 
