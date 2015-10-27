@@ -1116,7 +1116,7 @@ bool CmdRequest(const char *szRequest, EDF *pRequest, bool bDelete, EDF **pReply
       debug(DEBUGLEVEL_ERR, "CmdRequest write failed\n");
       CmdShutdown("Unable to write request");
    }
-   
+
    lWrite = tickdiff(dWrite);
 
    m_bRequestWait = true;
@@ -1451,7 +1451,7 @@ int CmdLineName(const char *szType, const char *szTitle, CMDTABFUNC pTabFunc, ED
    {
       sprintf(szWrite, "%s (\0374%s\0370)", szWrite, RETRO_NAME(szMenu));
    }
-   
+
    if(szDefaultOp != NULL)
    {
       sprintf(szExtra, "RETURN %s", szDefaultOp);
@@ -1650,7 +1650,7 @@ int main(int argc, char **argv)
    int iArgNum = 0, iPort = 0, iTimeOff = -1, iBuildNum = 0, iAccessLevel = LEVEL_NONE, iFolderID = 0, iValue = 0, iSystemTime = 0, iAttachmentSize = 0;
    int iUserType = 0, iNumEdits = 0, iGiveUp = 10, iLoop = 0, iMsgMark = 0, iConfigHighlight = -1, iSubType = 0, iStatus = 0, iDebugLevel = DEBUGLEVEL_INFO;
    bool bSecure = false, bBusy = false, bSilent = false, bShadow = false, bLoop = false, bFolderCheck = true, bRetro = false, bUsePID = false, bLoggedIn = false, bMarkingField = false;
-   bool bNew = false, bBrowse = false, bBrowserWait = false;
+   bool bNew = false, bBrowserWait = false;
    double dTick = 0;
    char szWrite[200], szError[200];
    char *szConfig = NULL, *szServer = NULL, *szUsername = NULL, *szPassword = NULL, *szDebugDir = NULL, *szReply = NULL, *szName = NULL;
