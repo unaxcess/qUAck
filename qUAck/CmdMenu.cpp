@@ -8874,7 +8874,7 @@ void MessageMenu()
 {
    int iMessageID = -1, iVoteType = 0;
    char cOption = '\0';
-   EDF *pRequest = NULL, *pReply = NULL, *pTemp = NULL, *pMessageIn, *pMessageOut = NULL;
+   EDF *pRequest = NULL, *pReply = NULL, *pTemp = NULL;
 
    while(cOption != 'j' && cOption != 'x')
    {
