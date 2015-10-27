@@ -1276,7 +1276,7 @@ void CmdMessageTreeList(EDF *pReply, const char *szType, int iListType, int iLis
    int iAccessLevel = LEVEL_NONE, iNumTrees = 0, iSubscribed = 0, iReadOnly = 0, iRestricted = 0, iSubType = 0;
    int iTotalMsgs = 0, iTotalSize = 0, iTotalUnread = 0, iSearchType = 0, iFound = 0, iExpire = -1, iTreeID = 0;
    int iCurrUser = 0, iEditorID = 0, iNumCols = 0, iPriority = 0;
-   bool bRetro = false, bDevOption = false, bLoop = true, bDeleted = false;
+   bool bRetro = false, bDevOption = false, bLoop = true;
    char cSubType = '\0';
    char szWrite[100], szDepth[100];
    char szNumTypes[32];
