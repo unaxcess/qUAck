@@ -511,7 +511,7 @@ bool CmdMessageAddFields(EDF *pRequest)
    int iFolderID = -1, iMsgType = 0, iToID = -1, iVoteEDF = 0, iDefTo = -1;
    int iMinValue = -1, iMaxValue = -1;
 	double dMinValue = 0, dMaxValue = 0;
-   char cVoteType = 'a', cVoteValues = 'f';
+   char cVoteValues = 'f';
    char *szOption = NULL, *szSubject = NULL, *szToName = NULL, *szUser = NULL;
    CmdInput *pInput = NULL;
    char cOption = '\0', cDefault = '\0';
