@@ -24,17 +24,22 @@ Under Unix you can put configuration options in a .qUAckrc file in your home dir
 
 Other settings:
 
-`<password="password"/>``
+```
+<password="password"/>
+```
 
 If you don't specify a password in the config file you will be prompted for one
 
 ```
 <secure=1/>
 <certificate="qUAck.pem"/>
+```
 
 The certificate field is optional for secure connections
 
-`<editor="/bin/vi"/>``
+```
+<editor="/bin/vi"/>
+```
 
 Use an external editor for text composition
 
