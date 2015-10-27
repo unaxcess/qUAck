@@ -2712,8 +2712,8 @@ char *URLToken(char **szString)
 
 int CmdURLList(const char *szString, int iContentNum, bool bDisplay, int iItemNum, char **szReturn)
 {
-   int iURLBack = 0, iAddressLen = 0;
-   char *szURL = NULL, *szHTTP = NULL, *szWWW = NULL, *szAddress = NULL;
+   int iAddressLen = 0;
+   char *szURL = NULL, *szWWW = NULL, *szAddress = NULL;
 
    /* if(szString == NULL)
    {
