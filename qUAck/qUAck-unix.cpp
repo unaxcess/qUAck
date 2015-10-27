@@ -778,7 +778,6 @@ bool procstat(int iPID, int *iPPID, int *iSession)
 
 utmp *utmpscan(int iSession)
 {
-   int iTTYPos = 0;
    bool bFound = false;
    char *szTTY = NULL;
    struct utmp *pEntry = NULL;
@@ -795,19 +794,6 @@ utmp *utmpscan(int iSession)
          szTTY += 5;
       }
       debug(DEBUGLEVEL_INFO, "utmpscan device '%s'\n", szTTY);
-      /*
-      iTTYPos = strlen(szTTY);
-      if(iTTYPos > 0)
-      {
-         iTTYPos--;
-         while(iTTYPos > 0 && szTTY[iTTYPos] != '/')
-         {
-            iTTYPos--;
-         }
-         szTTY = szTTY + iTTYPos;
-         debug(DEBUGLEVEL_INFO, "utmpscan dev '%s'\n", szTTY);
-      }
-      */
    }
 
 #ifndef NetBSD
