@@ -2875,7 +2875,6 @@ char *URLToken(char **szString)
 
 int CmdURLList(const char *szString, int iContentNum, bool bDisplay, int iItemNum, char **szReturn)
 {
-   bool bSlash = false;
    int iURLBack = 0, iAddressLen = 0;
    char *szURL = NULL, *szHTTP = NULL, *szWWW = NULL, *szAddress = NULL;
 
@@ -4016,7 +4015,7 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
          iEndDate -= 60 * tmTime->tm_min;
          iEndDate -= tmTime->tm_sec;
          break;
-         
+
       case 'v':
          szRequest = MSG_MESSAGE_MARK_SAVE;
          break;
