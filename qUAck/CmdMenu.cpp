@@ -2176,72 +2176,71 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
          if(iCurrLevel >= LEVEL_WITNESS || iUserID == iCurrID || bDevOption == true || !(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0))
          {
             pAnnounce->GetChild("username", &szUser);
-            if(pAnnounce->GetChild("hostname", &szHostname) == false)
+            // If user is not a guest, or if hide guest logins is false, then show the login
+            if ((0 == strncasecmp("GUEST", szUser, 5)) && m_hideGuestLogins)
             {
-               pAnnounce->GetChild("address", &szHostname);
-            }
-            pAnnounce->GetChild("location", &szLocation);
-            pAnnounce->GetChild("client", &szClient);
-
-            sprintf(szWrite, "%s\0376%s\0370", szReturn, RETRO_NAME(szUser));
-            if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
-            {
-               // sprintf(szWrite, "%s [\0376%d\0370]", szWrite, iConnID);
-               strcat(szWrite, "(\0376H\0370)");
-            }
-            sprintf(szWrite, "%s has %s", szWrite, stricmp(szMessage, MSG_USER_LOGIN) == 0 ? "logged in" : "been denied login"); 
-
-            if(szHostname != NULL)
-            {
-               int iEnd = CmdWidth() - strlen(szUser) - 24;
-               if(szLocation != NULL)
-               {
-                  iEnd -= strlen(szLocation);
-               }
-               // debug("CmdAnnounceShow end %d, host %d\n", iEnd, strlen(szHostname));
-               if(szClient != NULL)
-               {
-                  iEnd -= strlen(szClient);
-                  iEnd -= 7;
-               }
-               if(strlen(szHostname) > iEnd)
-               {
-                  if(iEnd < 0)
-                  {
-                     szHostname[0] = '\0';
-                  }
-                  else
-                  {
-                     szHostname[iEnd] = '\0';
-                  }
-               }
-               sprintf(szWrite, "%s from \0376%s\0370", szWrite, szHostname);
-               if(szLocation != NULL)
-               {
-                  sprintf(szWrite, "%s (\0376%s\0370)", szWrite, szLocation);
-               }
-               if(szClient != NULL)
-               {
-                  sprintf(szWrite, "%s using \0376%s\0370", szWrite, szClient);
-               }
-               /* if(pAnnounce->GetChildBool("secure") == true)
-               {
-               } */
-            }
-            else if(szLocation != NULL)
-            {
-               sprintf(szWrite, "%s from \0376%s\0370", szWrite, szLocation);
-            }
-            strcat(szWrite, "\n");
-
-            // If user is not a guest, or if hide guest logins is false, then show the delete
-            if ((0 != strncasecmp("GUEST", szUser, 5)) || !m_hideGuestLogins)
-            {
-               CmdWrite(szWrite);
+               iReturn = 0;
             }
             else
             {
-               iReturn = 0;
+               if(pAnnounce->GetChild("hostname", &szHostname) == false)
+               {
+                  pAnnounce->GetChild("address", &szHostname);
+               }
+               pAnnounce->GetChild("location", &szLocation);
+               pAnnounce->GetChild("client", &szClient);
+   
+               sprintf(szWrite, "%s\0376%s\0370", szReturn, RETRO_NAME(szUser));
+               if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
+               {
+                  // sprintf(szWrite, "%s [\0376%d\0370]", szWrite, iConnID);
+                  strcat(szWrite, "(\0376H\0370)");
+               }
+               sprintf(szWrite, "%s has %s", szWrite, stricmp(szMessage, MSG_USER_LOGIN) == 0 ? "logged in" : "been denied login"); 
+   
+               if(szHostname != NULL)
+               {
+                  int iEnd = CmdWidth() - strlen(szUser) - 24;
+                  if(szLocation != NULL)
+                  {
+                     iEnd -= strlen(szLocation);
+                  }
+                  // debug("CmdAnnounceShow end %d, host %d\n", iEnd, strlen(szHostname));
+                  if(szClient != NULL)
+                  {
+                     iEnd -= strlen(szClient);
+                     iEnd -= 7;
+                  }
+                  if(strlen(szHostname) > iEnd)
+                  {
+                     if(iEnd < 0)
+                     {
+                        szHostname[0] = '\0';
+                     }
+                     else
+                     {
+                        szHostname[iEnd] = '\0';
+                     }
+                  }
+                  sprintf(szWrite, "%s from \0376%s\0370", szWrite, szHostname);
+                  if(szLocation != NULL)
+                  {
+                     sprintf(szWrite, "%s (\0376%s\0370)", szWrite, szLocation);
+                  }
+                  if(szClient != NULL)
+                  {
+                     sprintf(szWrite, "%s using \0376%s\0370", szWrite, szClient);
+                  }
+                  /* if(pAnnounce->GetChildBool("secure") == true)
+                  {
+                  } */
+               }
+               else if(szLocation != NULL)
+               {
+                  sprintf(szWrite, "%s from \0376%s\0370", szWrite, szLocation);
+               }
+               strcat(szWrite, "\n");
+               CmdWrite(szWrite);
             }
 
             delete[] szUser;
@@ -2263,53 +2262,53 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
          if(iCurrLevel >= LEVEL_WITNESS || iUserID == iCurrID || bDevOption == true || !(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0))
          {
             pAnnounce->GetChild("username", &szUser);
-            bForce = pAnnounce->GetChildBool("force");
-            pAnnounce->GetChild("byname", &szBy);
-            bForce = pAnnounce->GetChildBool("force");
-            bLost = pAnnounce->GetChildBool("lost");
-            pAnnounce->GetChild("text", &szText);
 
-            sprintf(szEmote1, "%s\0376%s\0370", szReturn, RETRO_NAME(szUser));
-            if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
-            {
-               strcat(szEmote1, "(\0376H\0370)");
-            }
-            strcat(szEmote1, " has ");
-            if(bLost == true)
-            {
-               strcat(szEmote1, "lost connection");
-            }
-            else
-            {
-               sprintf(szEmote1, "%s%slogged out", szEmote1, bForce == true ? "been " : "");
-            }
-
-            sprintf(szEmote2, "%sLogout: \0376%s\0370", szReturn, RETRO_NAME(szUser));
-            if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
-            {
-               strcat(szEmote2, "(\0376H\0370)");
-            }
-
-            if(szUser != NULL && szBy != NULL && strcmp(szUser, szBy) != 0)
-            {
-               sprintf(szEmote1, "%s by \0376%s\0370", szEmote1, RETRO_NAME(szBy));
-               sprintf(szEmote2, "%s by \0376%s\0370", szEmote2, RETRO_NAME(szBy));
-            }
-
-            szTemp = UserEmote(szEmote1, szEmote2, szText, true, '6');
-            strcpy(szWrite, szTemp);
-            delete[] szTemp;
-
-            strcat(szWrite, "\n");
-
-            // If user is not a guest, or if hide guest logins is false, then show the delete
-            if ((0 != strncasecmp("GUEST", szUser, 5)) || !m_hideGuestLogins)
-            { 
-               CmdWrite(szWrite);
-            }
-            else
+            // If user is not a guest, or if hide guest logins is false, then show the logout
+            if ((0 == strncasecmp("GUEST", szUser, 5)) && m_hideGuestLogins)
             {
                iReturn = 0;
+            }
+            else
+            {
+               bForce = pAnnounce->GetChildBool("force");
+               pAnnounce->GetChild("byname", &szBy);
+               bForce = pAnnounce->GetChildBool("force");
+               bLost = pAnnounce->GetChildBool("lost");
+               pAnnounce->GetChild("text", &szText);
+
+               sprintf(szEmote1, "%s\0376%s\0370", szReturn, RETRO_NAME(szUser));
+               if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
+               {
+                  strcat(szEmote1, "(\0376H\0370)");
+               }
+               strcat(szEmote1, " has ");
+               if(bLost == true)
+               {
+                  strcat(szEmote1, "lost connection");
+               }
+               else
+               {
+                  sprintf(szEmote1, "%s%slogged out", szEmote1, bForce == true ? "been " : "");
+               }
+   
+               sprintf(szEmote2, "%sLogout: \0376%s\0370", szReturn, RETRO_NAME(szUser));
+               if(mask(iStatus, LOGIN_SHADOW) == true || iConnID > 0)
+               {
+                  strcat(szEmote2, "(\0376H\0370)");
+               }
+
+               if(szUser != NULL && szBy != NULL && strcmp(szUser, szBy) != 0)
+               {
+                  sprintf(szEmote1, "%s by \0376%s\0370", szEmote1, RETRO_NAME(szBy));
+                  sprintf(szEmote2, "%s by \0376%s\0370", szEmote2, RETRO_NAME(szBy));
+               }
+
+               szTemp = UserEmote(szEmote1, szEmote2, szText, true, '6');
+               strcpy(szWrite, szTemp);
+               delete[] szTemp;
+
+               strcat(szWrite, "\n");
+               CmdWrite(szWrite);
             }
 
             delete[] szUser;
