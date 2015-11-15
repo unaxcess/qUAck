@@ -44,6 +44,9 @@ char *m_szAttachmentDir = NULL;
 
 int /*m_iPrevFolder = -1, */ m_iMsgPos = MSG_EXIT, m_iFromID = -1;
 
+// Flag to record if the user wants to see guest login/logout/delete - default is to notify (false)
+bool m_hideGuestLogins = false;
+
 
 bool FolderEditMenu(int iEditID);
 void DefaultWholist();
@@ -1089,6 +1092,7 @@ CmdInput *CmdAdmin(int iAccessLevel)
    }
    pInput->MenuAdd('a', "Add user");
    pInput->MenuAdd('e', "Edit user");
+   pInput->MenuAdd('g', "toggle Guest login events");
    pInput->MenuAdd('l', "Logout user");
    pInput->MenuAdd('q', "direct reQuest");
    if(iAccessLevel >= LEVEL_WITNESS)
@@ -2144,13 +2148,21 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
          pAnnounce->GetChild("username", &szUser);
          pAnnounce->GetChild("byname", &szBy);
 
-         sprintf(szWrite, "%sUser \0376%s\0370 has been deleted", szReturn, RETRO_NAME(szUser));
-         if(szBy != NULL)
+         // If user is not a guest, or if hide guest logins is false, then show the delete
+         if ((0 != strncasecmp("GUEST", szUser, 5)) || !m_hideGuestLogins) 
          {
-            sprintf(szWrite, "%s by \0376%s\0370", szWrite, szBy);
+            sprintf(szWrite, "%sUser \0376%s\0370 has been deleted", szReturn, RETRO_NAME(szUser));
+            if(szBy != NULL)
+            {
+               sprintf(szWrite, "%s by \0376%s\0370", szWrite, szBy);
+            }
+            strcat(szWrite, "\n");
+            CmdWrite(szWrite);
          }
-         strcat(szWrite, "\n");
-         CmdWrite(szWrite);
+         else
+         {
+            iReturn = 0;
+         }
 
          delete[] szUser;
          delete[] szBy;
@@ -2177,7 +2189,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
                // sprintf(szWrite, "%s [\0376%d\0370]", szWrite, iConnID);
                strcat(szWrite, "(\0376H\0370)");
             }
-            sprintf(szWrite, "%s has %s", szWrite, stricmp(szMessage, MSG_USER_LOGIN) == 0 ? "logged in" : "been denied login");
+            sprintf(szWrite, "%s has %s", szWrite, stricmp(szMessage, MSG_USER_LOGIN) == 0 ? "logged in" : "been denied login"); 
 
             if(szHostname != NULL)
             {
@@ -2221,7 +2233,16 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
                sprintf(szWrite, "%s from \0376%s\0370", szWrite, szLocation);
             }
             strcat(szWrite, "\n");
-            CmdWrite(szWrite);
+
+            // If user is not a guest, or if hide guest logins is false, then show the delete
+            if ((0 != strncasecmp("GUEST", szUser, 5)) || !m_hideGuestLogins)
+            {
+               CmdWrite(szWrite);
+            }
+            else
+            {
+               iReturn = 0;
+            }
 
             delete[] szUser;
             delete[] szHostname;
@@ -2280,7 +2301,16 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
             delete[] szTemp;
 
             strcat(szWrite, "\n");
-            CmdWrite(szWrite);
+
+            // If user is not a guest, or if hide guest logins is false, then show the delete
+            if ((0 != strncasecmp("GUEST", szUser, 5)) || !m_hideGuestLogins)
+            { 
+               CmdWrite(szWrite);
+            }
+            else
+            {
+               iReturn = 0;
+            }
 
             delete[] szUser;
             delete[] szBy;
@@ -7792,6 +7822,21 @@ void AdminMenu()
                UserEditMenu(iID);
             }
             break;
+
+         case 'g':      // Toggle Guest login information
+            m_hideGuestLogins = !m_hideGuestLogins;
+            CmdWrite("Guest login events now ");
+            if (m_hideGuestLogins)
+            {  
+               CmdWrite("hidden");
+            }
+            else
+            {  
+               CmdWrite("displayed");
+            }
+            CmdWrite("\n");
+            break;
+
 
          case 'h':
             LocationsMenu();
