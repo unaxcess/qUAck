@@ -62,7 +62,6 @@
 #define USER_EDIT USER + 200
 #define TALK 5000
 #define MESSAGE 6000
-#define GAME 7000
 
 char *CmdFolderTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
 char *CmdChannelTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);

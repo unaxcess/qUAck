@@ -36,7 +36,6 @@
 #include "client/CliUser.h"
 
 #include "qUAck.h"
-#include "GameFactory.h"
 
 // char *m_szBrowser = NULL;
 // bool m_bBrowserWait = false;
@@ -45,7 +44,6 @@ char *m_szAttachmentDir = NULL;
 
 int /*m_iPrevFolder = -1, */ m_iMsgPos = MSG_EXIT, m_iFromID = -1;
 
-Game *g_pGame = NULL;
 
 bool FolderEditMenu(int iEditID);
 void DefaultWholist();
@@ -743,7 +741,6 @@ CmdInput *CmdMain(int iAccessLevel, int iNumFolders, bool bDevOption, bool bPagi
    {
       pInput->MenuAdd('i', "show Ignored page");
    } */
-   pInput->MenuAdd('k', "larK about");
    if(mask(CmdInput::MenuStatus(), LOGIN_SHADOW) == false)
    {
       pInput->MenuAdd('o', "page histOry");
@@ -2576,44 +2573,6 @@ CmdInput *CmdInputSetup(int iStatus)
          if(CmdCurrChannel() != -1)
          {
             pInput->MenuValue('/');
-         }
-         break;
-
-      case GAME:
-         pInput = new CmdInput(CMD_MENU_TIME, "Game");
-
-         if(g_pGame != NULL)
-         {
-            if(g_pGame->IsRunning() == true)
-            {
-               g_pGame->Loop();
-
-               pOptions = g_pGame->KeyOptions();
-
-               bLoop = pOptions->Child("key");
-               while(bLoop == true)
-               {
-                  bLoop = pOptions->Next("key");
-                  if(bLoop == false)
-                  {
-                     pOptions->Parent();
-                  }
-               }
-
-               delete pOptions;
-            }
-            else if(g_pGame->IsCreator() == true)
-            {
-               pInput->MenuAdd('s', "Start game");
-               pInput->MenuAdd('e', "End game");
-            }
-            pInput->MenuAdd('x', "eXit");
-         }
-         else
-         {
-            pInput->MenuAdd('c', "Create game");
-            pInput->MenuAdd('j', "Join game");
-            pInput->MenuAdd('x', "eXit");
          }
          break;
    }
@@ -8564,12 +8523,6 @@ bool PageMenu(EDF *pPage, bool bBell)
          m_pServiceList->SetChild("active", stricmp(szServiceAction, ACTION_LOGIN) == 0 ? true : false);
 
          m_pServiceList->Parent();
-
-         if(g_pGame != NULL && g_pGame->ServiceID() == iServiceID && stricmp(szServiceAction, ACTION_LOGOUT) == 0)
-         {
-            delete g_pGame;
-            g_pGame = NULL;
-         }
       }
       else
       {
@@ -8579,14 +8532,6 @@ bool PageMenu(EDF *pPage, bool bBell)
          bReturn = false;
       }
       // CmdWrite(szWrite);
-
-      if(g_pGame != NULL && g_pGame->ServiceID() == iServiceID)
-      {
-         debug("PageMenu matched service ID %d with game\n", iServiceID);
-         bReturn = g_pGame->Action(szServiceAction, pPage);
-
-         m_pServiceList->Parent();
-      }
 
       delete[] szServiceAction;
 
@@ -9091,151 +9036,6 @@ void BusyMenu()
    }
 }
 
-void GameMenu()
-{
-   STACKTRACE
-   int iServiceID = 0, iOption = 0;
-   bool bMenu = true, bLoop = false;
-   char cOption = '\0';
-   char szWrite[200];
-   char *szName = NULL, *szContentType = NULL;
-   CmdInput *pInput = NULL;
-   EDF *pOptions = NULL;
-   Game *pTemp = NULL;
-
-   while(bMenu == true)
-   {
-      cOption = CmdMenu(GAME);
-
-      if(g_pGame != NULL && g_pGame->IsRunning() == true)
-      {
-         g_pGame->Key(cOption);
-
-         if(g_pGame->IsEnded() == true)
-         {
-            delete g_pGame;
-            g_pGame = NULL;
-         }
-      }
-      else
-      {
-         switch(cOption)
-         {
-            case 'c':
-            case 'j':
-               iServiceID = -1;
-               bLoop = m_pServiceList->Child("service");
-               while(bLoop == true)
-               {
-                  if(m_pServiceList->GetChild("content-type", &szContentType) == true && szContentType != NULL)
-                  {
-                     pTemp = FindGame(szContentType);
-                     if(pTemp != NULL)
-                     {
-                        m_pServiceList->Get(NULL, &iServiceID);
-                        m_pServiceList->GetChild("name", &szName);
-
-                        sprintf(szWrite, "\0373%d\0370: \0373%s\0370\n", iServiceID, szName);
-                        CmdWrite(szWrite);
-
-                        delete[] szName;
-
-                        delete pTemp;
-                     }
-                     delete[] szContentType;
-                  }
-
-                  bLoop = m_pServiceList->Next("service");
-                  if(bLoop == false)
-                  {
-                     m_pServiceList->Parent();
-                  }
-               }
-
-               if(iServiceID != -1)
-               {
-                  iOption = CmdLineNum("Game");
-                  if(EDFFind(m_pServiceList, "service", iOption, false) == true)
-                  {
-                     m_pServiceList->GetChild("content-type", &szContentType);
-
-                     g_pGame = FindGame(szContentType);
-
-                     if(cOption == 'c')
-                     {
-                        pOptions = g_pGame->CreateOptions();
-
-                        if(g_pGame->Create(iOption, pOptions) == false)
-                        {
-                           CmdWrite("Cannot create game\n");
-                           delete g_pGame;
-                           g_pGame = NULL;
-                        }
-
-                        delete pOptions;
-                     }
-                     else if(cOption == 'j')
-                     {
-                        pOptions = g_pGame->JoinOptions();
-
-                        if(g_pGame->Join(iOption, pOptions) == false)
-                        {
-                           CmdWrite("Cannot join game\n");
-                           delete g_pGame;
-                           g_pGame = NULL;
-                        }
-
-                        delete pOptions;
-                     }
-
-                     delete[] szContentType;
-
-                     m_pServiceList->Parent();
-                  }
-                  else
-                  {
-                     CmdWrite("Invalid game\n");
-                  }
-               }
-               else
-               {
-                  CmdWrite("No games found\n");
-               }
-               break;
-
-            case 'e':
-               g_pGame->End();
-               break;
-
-            case 's':
-               pOptions = g_pGame->StartOptions();
-
-               if(g_pGame->Start(pOptions) == false)
-               {
-                  CmdWrite("Cannot start game\n");
-                  delete g_pGame;
-                  g_pGame = NULL;
-               }
-
-               delete pOptions;
-               break;
-
-            case 'x':
-               if(g_pGame != NULL)
-               {
-                  g_pGame->End();
-               }
-
-               bMenu = false;
-               break;
-         }
-      }
-   }
-
-   delete g_pGame;
-   g_pGame = NULL;
-}
-
 void MainMenu()
 {
    STACKTRACE
@@ -9440,10 +9240,6 @@ void MainMenu()
             {
                FolderJoinMenu(-1);
             }
-            break;
-
-         case 'k':
-            GameMenu();
             break;
 
          case 'l':
