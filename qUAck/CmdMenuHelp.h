@@ -64,8 +64,6 @@
 #define HELP_MAIN_Q "Go on, piss off. Leave a message though."
 #undef HELP_MAIN_S
 #define HELP_MAIN_S "See who logged off just before you logged on. And worry what they were saying about you. I would."
-#undef HELP_MAIN_T
-#define HELP_MAIN_T "Join the talk channels. See the Talk Menu section. Or don't. Who cares?"
 #undef HELP_MAIN_U
 #define HELP_MAIN_U "See who's who, who isn't, and what they have to say about themselves."
 #undef HELP_MAIN_W
@@ -232,44 +230,4 @@
 #undef HELP_FOLDER_X
 #define HELP_FOLDER_X "Go back to the Main Menu like the loser you are. Get out of my sight."
 
-#define HELP_TALK_A NULL
-#define HELP_TALK_B NULL
-#define HELP_TALK_C NULL
-#define HELP_TALK_D NULL
-#define HELP_TALK_E NULL
-#define HELP_TALK_F NULL
-#define HELP_TALK_G NULL
-#define HELP_TALK_H NULL
-#define HELP_TALK_I NULL
-#define HELP_TALK_J NULL
-#define HELP_TALK_K NULL
-#define HELP_TALK_L NULL
-#define HELP_TALK_M NULL
-#define HELP_TALK_N NULL
-#define HELP_TALK_O NULL
-#define HELP_TALK_P NULL
-#define HELP_TALK_Q NULL
-#define HELP_TALK_R NULL
-#define HELP_TALK_S NULL
-#define HELP_TALK_T NULL
-#define HELP_TALK_U NULL
-#define HELP_TALK_V NULL
-#define HELP_TALK_W NULL
-#define HELP_TALK_X NULL
-#define HELP_TALK_Y NULL
-#define HELP_TALK_Z NULL
-#undef HELP_TALK_I
-#define HELP_TALK_I "Like, what's happening dude!"
-#undef HELP_TALK_J
-#define HELP_TALK_J "See what channels are available, then choose one, worthless mortal."
-#undef HELP_TALK_L
-#define HELP_TALK_L "Show what messages you're missing by being on Talk. Decisions, decisions. To quit Talk and read them, or stay and exchange meaningless banalities and random line noise?"
-#undef HELP_TALK_M
-#define HELP_TALK_M "Emote something. Or simply use ':' which requires one less keypress. Smart."
-#undef HELP_TALK_P
-#define HELP_TALK_P "Page someone while in Talk. Useful, eh?"
-#undef HELP_TALK_Q
-#define HELP_TALK_Q "\"I, I, I pressed the wrong key, take me away from all of this.\""
-#undef HELP_TALK_W
-#define HELP_TALK_W "Check who's replying to your carefully crafted word epic. Or who spotted the typos."
 #endif

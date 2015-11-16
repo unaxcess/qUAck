@@ -60,11 +60,9 @@
 #define USER 4000
 #define USER_WHO USER + 100
 #define USER_EDIT USER + 200
-#define TALK 5000
 #define MESSAGE 6000
 
 char *CmdFolderTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
-char *CmdChannelTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
 char *CmdUserTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
 char *CmdUserLoginTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
 char *CmdAgentLoginTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue);
@@ -94,7 +92,6 @@ int MessageSearchResultsMenu(EDF *pRequest);
 bool UserEditMenu(int iEditID);
 bool PageMenu(EDF *pPage, bool bBell);
 void BulletinMenu(bool bShowAll);
-bool TalkCommandMenu(bool bJoin, bool bPage, bool bSend, bool bActive, bool bWholist, bool bReturn);
 void MainMenu();
 
 bool CmdBrowser(char *szBrowser, bool bBrowserWait);
@@ -115,8 +112,6 @@ void NewFeatures();
 bool ServiceActivate(EDF *pData);
 
 bool CreateUserMenu(bool bLoggedIn, char **szUsername, char **szPassword);//, EDF *pSystemList);
-
-bool TalkMenu(int iChannelID);
 
 char *URLToken(char **szString);
 

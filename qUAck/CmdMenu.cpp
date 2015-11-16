@@ -32,7 +32,6 @@
 #include "CmdShow.h"
 
 #include "client/CliFolder.h"
-#include "client/CliTalk.h"
 #include "client/CliUser.h"
 
 #include "qUAck.h"
@@ -60,10 +59,6 @@ bool CmdTabReset(EDF *pData, int iType)
    {
       return pData->Child("folder");
    }
-   else if(iType == 2)
-   {
-      return pData->Child("channel");
-   }
    else if(iType == 3 || iType == 4 || iType == 5)
    {
       return pData->Child("user");
@@ -85,10 +80,6 @@ bool CmdTabNext(EDF *pData, int iType)
    if(iType == 1)
    {
       bReturn = pData->Iterate("folder");//, "folders");
-   }
-   else if(iType == 2)
-   {
-      bReturn = pData->Next("channel");
    }
    else if(iType == 3 || iType == 4 || iType == 5)
    {
@@ -232,11 +223,6 @@ char *CmdTab(int iType, EDF *pData, const char *szData, int iDataPos, bool bFull
 char *CmdFolderTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue)
 {
    return CmdTab(1, pData, szData, iDataPos, bFull, iTabValue);
-}
-
-char *CmdChannelTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue)
-{
-   return CmdTab(2, pData, szData, iDataPos, bFull, iTabValue);
 }
 
 char *CmdUserTab(EDF *pData, const char *szData, int iDataPos, bool bFull, int *iTabValue)
@@ -768,14 +754,6 @@ CmdInput *CmdMain(int iAccessLevel, int iNumFolders, bool bDevOption, bool bPagi
    {
       pInput->MenuAdd('s', "Show last few logins", HELP_MAIN_S);
    }
-   if(CmdVersion("2.5") < 0 || CmdVersion("2.6") >= 0)
-   {
-      pInput->MenuAdd('t', "Join Talk", HELP_MAIN_T);
-      if(CmdInput::MenuCase() == true)
-      {
-         pInput->MenuAdd('T', "Talk channels", HELP_MAIN_T);
-      }
-   }
    pInput->MenuAdd('u', "User directory", HELP_MAIN_U);
    pInput->MenuAdd('w', "Who is logged in", HELP_MAIN_W);
    pInput->MenuAdd('y', "view sYstem bulletins", HELP_MAIN_Y);
@@ -812,11 +790,6 @@ CmdInput *CmdMain(int iAccessLevel, int iNumFolders, bool bDevOption, bool bPagi
       } */
       pInput->MenuAdd('n', "read New messages", HELP_MAIN_N);
       pInput->MenuDefault('n');
-   }
-
-   if(CmdCurrChannel() != -1)
-   {
-      pInput->MenuValue('/');
    }
 
    return pInput;
@@ -1072,11 +1045,6 @@ CmdInput *CmdFolder(int iCurrID, int iAccessLevel, int iNewMsgs, char *szFolderN
          break;
    }
 
-   if(CmdCurrChannel() != -1)
-   {
-      pInput->MenuValue('/');
-   }
-
    return pInput;
 }
 
@@ -1120,11 +1088,6 @@ CmdInput *CmdAdmin(int iAccessLevel)
    }
 
    pInput->MenuAdd('x', "eXit");
-
-   if(CmdCurrChannel() != -1)
-   {
-      pInput->MenuValue('/');
-   }
 
    return pInput;
 }
@@ -1349,7 +1312,7 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
    bool bRetro = false, bLoop = false, bExtraCheck = false, bFirst = true, bFakePage = false, bStatus = false, bLost = false, bAction = true, bDevOption = false;
    char szTime[100], szWrite[200], cColour = '6';
    char *szMessage = NULL, *szHostname = NULL, *szLocation = NULL, *szBy = NULL, *szText = NULL;
-   char *szUser = NULL, *szClient = NULL, *szFolder = NULL, *szMove = NULL, *szSubject = NULL, *szChannel = NULL;
+   char *szUser = NULL, *szClient = NULL, *szFolder = NULL, *szMove = NULL, *szSubject = NULL;
    char szEmote1[200], szEmote2[200], *szTemp = NULL;
    EDF *pRequest = NULL, *pReply = NULL;
 
@@ -2021,112 +1984,6 @@ int CmdAnnounceShow(EDF *pAnnounce, const char *szReturn)
          delete[] szFolder;
          delete[] szSubject;
       }
-      /* else if(stricmp(szMessage, MSG_CHANNEL_ADD) == 0)
-      {
-      } */
-      /* else if(stricmp(szMessage, MSG_CHANNEL_DELETE) == 0)
-      {
-         pAnnounce->GetChild("channelid", &iChannelID);
-         pAnnounce->GetChild("channelname", &szName);
-
-         sprintf(szWrite, "%s\0376%s\0370 has been deleted\n", szReturn, szName);
-         CmdWrite(szWrite);
-
-         delete[] szName;
-
-         SvrInputSetup(pConn, pData, MAIN);
-      } */
-      else if((CmdVersion("2.5") < 0 || CmdVersion("2.5") >= 0) && stricmp(szMessage, MSG_CHANNEL_SUBSCRIBE) == 0)
-      {
-         // EDFPrint("CmdAnnounceShow channel_subscribe", pData, false, true);
-         pAnnounce->GetChild("channelname", &szChannel);
-         pAnnounce->GetChild("username", &szUser);
-         pAnnounce->GetChild("announcetime", &iValue);
-         // tmTime = localtime((time_t *)&iValue);
-         // strftime(szTime, sizeof(szTime), "%H:%M:%S", tmTime);
-         StrTime(szTime, STRTIME_TIME, iValue);
-
-         sprintf(szWrite, "%s\0376%s\0370 has joined ", szReturn, szUser);
-         if(szChannel != NULL)
-         {
-            sprintf(szWrite, "%s\0376%s\0370", szWrite, RETRO_NAME(szChannel));
-         }
-         else
-         {
-            strcat(szWrite, "talk");
-         }
-         sprintf(szWrite, "%s (\0376%s\0370)\n", szWrite, szTime);
-         CmdWrite(szWrite);
-
-         delete[] szUser;
-         delete[] szChannel;
-      }
-      else if((CmdVersion("2.5") < 0 || CmdVersion("2.5") >= 0) && stricmp(szMessage, MSG_CHANNEL_UNSUBSCRIBE) == 0)
-      {
-         // EDFPrint("CmdAnnounceShow channel_unsubscribe", pData, false, true);
-         pAnnounce->GetChild("channelname", &szChannel);
-         pAnnounce->GetChild("username", &szUser);
-         pAnnounce->GetChild("announcetime", &iValue);
-         // tmTime = localtime((time_t *)&iValue);
-         // strftime(szTime, sizeof(szTime), "%H:%M:%S", tmTime);
-         StrTime(szTime, STRTIME_TIME, iValue);
-
-         sprintf(szWrite, "%s\0376%s\0370 has left ", szReturn, szUser);
-         if(szChannel != NULL)
-         {
-            sprintf(szWrite, "%s\0376%s\0370", szWrite, RETRO_NAME(szChannel));
-         }
-         else
-         {
-            sprintf(szWrite, "%stalk", szWrite);
-         }
-         sprintf(szWrite, "%s (\0376%s\0370)\n", szWrite, szTime);
-         CmdWrite(szWrite);
-
-         delete[] szUser;
-         delete[] szChannel;
-      }
-      else if((CmdVersion("2.5") < 0 || CmdVersion("2.5") >= 0) && stricmp(szMessage, MSG_CHANNEL_SEND) == 0)
-      {
-         // debug("CmdAnnounceShow talk message %d %d\n", CmdMenuType(), MENU_BLANK);
-
-         pAnnounce->GetChild("fromid", &iFromID);
-         if(pAnnounce->GetChild("fromname", &szUser) == false)
-         {
-            pAnnounce->GetChild("channelname", &szUser);
-
-            cColour = '1';
-         }
-         else
-         {
-            if(iFromID == iCurrID)
-            {
-               cColour = '1';
-            }
-            else
-            {
-               cColour = '3';
-            }
-         }
-         pAnnounce->GetChild("text", &szText);
-
-         if(szText != NULL)
-         {
-            CmdPageOn();
-
-            sprintf(szEmote1, "%s(\037%c%s\0370)", szReturn, cColour, RETRO_NAME(szUser));
-            sprintf(szEmote2, "%s\037%c%s\0370", szReturn, cColour, RETRO_NAME(szUser));
-
-            szTemp = UserEmote(szEmote1, szEmote2, szText, false, cColour);
-            CmdWrite(szTemp);
-            delete[] szTemp;
-
-            CmdWrite("\n");
-            CmdPageOff();
-            delete[] szText;
-         }
-         delete[] szUser;
-      }
       else if(stricmp(szMessage, MSG_USER_ADD) == 0)
       {
          pAnnounce->GetChild("username", &szUser);
@@ -2558,10 +2415,6 @@ CmdInput *CmdInputSetup(int iStatus)
          delete[] szFolderName;
          break;
 
-      case TALK:
-         pInput = new CmdInput(CMD_MENU_ANY | CMD_MENU_SILENT, "");
-         break;
-
       case MESSAGE:
          pInput = new CmdInput(CMD_MENU_TIME | CMD_MENU_NOCASE, "Messages");
          if(CmdVersion("2.5") >= 0 && iAccessLevel >= LEVEL_WITNESS)
@@ -2599,10 +2452,6 @@ CmdInput *CmdInputSetup(int iStatus)
          }
          pInput->MenuAdd('x', "eXit", NULL, true);
 
-         if(CmdCurrChannel() != -1)
-         {
-            pInput->MenuValue('/');
-         }
          break;
    }
 
@@ -5033,10 +4882,6 @@ void FolderMenu(int iFolderID, int iMessageID, int iMsgPos)
 
          case 'z':
             ContentMenu(m_pMessageView, "msg", CmdCurrMessage());
-            break;
-
-         case '/':
-            TalkCommandMenu(false, false, true, false, false, false);
             break;
 
          default:
@@ -8052,10 +7897,6 @@ void AdminMenu()
             delete[] szOption;
             break;
 
-         case '/':
-            TalkCommandMenu(false, false, true, false, false, false);
-            break;
-
          default:
             debug(DEBUGLEVEL_WARN, "AdminMenu no action for %c\n", cOption);
             break;
@@ -8161,368 +8002,6 @@ void UserWhoMenu()
       CmdUserWho(pReply, iWhoType);
       delete pReply;
    }
-}
-
-bool TalkJoinMenu()
-{
-   STACKTRACE
-   int iChannelID = -1;
-
-   iChannelID = CmdLineChannel();
-
-   if(iChannelID == -1)
-   {
-      return false;
-   }
-
-   if(CmdChannelJoin(iChannelID) == false)
-   {
-      return false;
-   }
-
-   return true;
-}
-
-bool TalkCommandMenu(bool bJoin, bool bPage, bool bSend, bool bActive, bool bWholist, bool bReturn)
-{
-   int iAccessLevel = LEVEL_NONE;
-   bool bQuit = false;
-   char cOption = '\0';
-   char *szEmote = NULL, *szText = NULL;
-   CmdInput *pInput = NULL;
-   EDF *pRequest = NULL, *pReply = NULL;
-
-   m_pUser->GetChild("accesslevel", &iAccessLevel);
-
-   pInput = new CmdInput(CMD_MENU_NOCASE, "Talk");
-   // pInput->MenuAdd('e', "Emote");
-   pInput->MenuAdd('i', "channel Info");
-   if(bJoin == true)
-   {
-      pInput->MenuAdd('j', "Join a channel");
-   }
-   pInput->MenuAdd('l', "List channels");
-   if(mask(CmdInput::MenuStatus(), LOGIN_SHADOW) == false && bPage == true)
-   {
-      pInput->MenuAdd('p', "Page");
-   }
-   pInput->MenuAdd('q', "Quit talk");
-   if(bSend == true)
-   {
-      pInput->MenuAdd('s', "Send");
-      if(iAccessLevel >= LEVEL_WITNESS)
-      {
-         pInput->MenuAdd('c', "Channel message");
-      }
-   }
-   if(bActive == true)
-   {
-      pInput->MenuAdd('t', "quiT talk (leave channel active)");
-   }
-   if(bWholist == true)
-   {
-      pInput->MenuAdd('w', "Who is logged in");
-   }
-   pInput->MenuAdd('x', bReturn == true ? "eXit (return to talk)" : "eXit");
-
-   cOption = CmdMenu(pInput);
-   switch(cOption)
-   {
-      case 'c':
-      case 'e':
-      case 's':
-         szText = CmdText(CMD_LINE_NOTITLE);
-         if(szText != NULL && strcmp(szText, "") != 0)
-         {
-            if(cOption == 'e')
-            {
-               szEmote = new char[strlen(szText) + 2];
-               szEmote[0] = ':';
-               strcpy(szEmote + 1, szText);
-
-               delete[] szText;
-               szEmote = szText;
-            }
-
-            pRequest = new EDF();
-            pRequest->AddChild("channelid", CmdCurrChannel());
-            pRequest->AddChild("text", szText);
-            if(cOption == 'c')
-            {
-               pRequest->AddChild("nameless", true);
-            }
-            if(CmdRequest(MSG_CHANNEL_SEND, pRequest, &pReply) == false)
-            {
-               CmdEDFPrint("TalkMenu request failed", pReply);
-            }
-            delete pReply;
-         }
-         delete[] szText;
-         break;
-
-      case 'i':
-         pRequest = new EDF();
-         pRequest->AddChild("channelid", CmdCurrChannel());
-         if(CmdRequest(MSG_CHANNEL_LIST, pRequest, &pReply) == true)
-         {
-            if(pReply->Child("channel") == true)
-            {
-               CmdEDFPrint("TalkMenu reply", pReply);
-
-               CmdMessageTreeView(pReply, "channel");
-            }
-            else
-            {
-               CmdWrite("TalkMenu no channel section\n");
-            }
-         }
-         else
-         {
-            CmdEDFPrint("TalkMenu request failed", pReply);
-         }
-         delete pReply;
-         break;
-
-      case 'l':
-         pRequest = new EDF();
-         pRequest->AddChild("searchtype", 3);
-
-         CmdRequest(MSG_CHANNEL_LIST, pRequest, &pReply);
-         // pReply->Sort("channel", "name", true);
-         CmdMessageTreeList(pReply, "channel", 0, 1);
-         break;
-
-      case 'j':
-         TalkJoinMenu();
-         break;
-
-      case 'p':
-         CmdUserPage(NULL);
-         break;
-
-      case 'q':
-         CmdChannelLeave();
-         bQuit = true;
-         break;
-
-      case 't':
-         if(CmdInput::MenuLevel() < CMDLEV_EXPERT)
-         {
-            CmdWrite("This channel will remain active. Type '/' to see channel options, '/q' to quit\n");
-         }
-
-         bQuit = true;
-         break;
-
-      case 'w':
-         DefaultWholist();
-         break;
-   }
-
-   return bQuit;
-}
-
-bool TalkMenu()
-{
-   STACKTRACE
-   // int iMenuLevel = CMDLEV_BEGIN;
-   bool bQuit = false;
-   char cOption = '\0', szInit[2];
-   char *szText = NULL;
-   EDF *pRequest = NULL, *pReply = NULL;
-
-   szInit[1] = '\0';
-
-   if(TalkJoinMenu() == false)
-   {
-      return false;
-   }
-
-   // iMenuLevel = CmdInput::MenuLevel();
-   if(CmdInput::MenuLevel() < CMDLEV_EXPERT)
-   {
-      CmdWrite("Welcome to multichannel talk\n\nType '/?' for help, '/q' to quit\n");
-   }
-
-   while(bQuit == false)
-   {
-      cOption = CmdMenu(TALK);
-
-      switch(cOption)
-      {
-         case '/':
-            bQuit = TalkCommandMenu(true, true, true, true, true, true);
-            break;
-
-         default:
-            szInit[0] = cOption;
-            szText = CmdText(CMD_LINE_NOTITLE, szInit);
-            if(strcmp(szText, "") != 0)
-            {
-               pRequest = new EDF();
-               pRequest->AddChild("channelid", CmdCurrChannel());
-               pRequest->AddChild("text", szText);
-               if(CmdRequest(MSG_CHANNEL_SEND, pRequest, &pReply) == false)
-               {
-                  CmdEDFPrint("TalkMenu request failed", pReply);
-               }
-               delete pReply;
-            }
-            delete[] szText;
-            break;
-      }
-   }
-
-   return true;
-}
-
-bool TalkMenuOld()
-{
-   STACKTRACE
-   int iFolderID = 0, iMenuLevel = CMDLEV_BEGIN;
-   bool bQuit = false;
-   char cOption = '\0', szInit[2];
-   char *szText = NULL, *szEmote = NULL;
-   EDF *pRequest = NULL, *pReply = NULL;
-   CmdInput *pInput = NULL;
-
-   debug(DEBUGLEVEL_INFO, "TalkMenuOld entry\n");
-
-   pRequest = new EDF();
-   if(CmdVersion("2.5") < 0)
-   {
-      pRequest->AddChild("channelid", 0);
-   }
-   // EDFPrint("TalkMenuOld subscription request", pRequest);
-   if(CmdRequest(CmdVersion("2.5") >= 0 ? MSG_FOLDER_ACTIVATE : MSG_CHANNEL_SUBSCRIBE, pRequest, &pReply) == false)
-   {
-      // EDFPrint("TalkMenuOld subscribe failed", pReply);
-
-      delete pReply;
-
-      debug(DEBUGLEVEL_INFO, "TalkMenuOld exit false\n");
-      return false;
-   }
-   else if(CmdVersion("2.5") >= 0)
-   {
-      pReply->GetChild("folderid", &iFolderID);
-   }
-   // EDFPrint("TalkMenuOld subscribe success", pReply);
-
-   szInit[1] = '\0';
-
-   delete pReply;
-
-   /* m_pUser->Root();
-   if(m_pUser->Child("client", CLIENT_NAME()) == true)
-   {
-      m_pUser->GetChild("menulevel", &iMenuLevel);
-      m_pUser->Parent();
-   } */
-   iMenuLevel = CmdInput::MenuLevel();
-
-   if(iMenuLevel < CMDLEV_EXPERT)
-   {
-      CmdWrite("Welcome to multichannel talk\n\nType '/?' for help, '/q' to quit\n");
-   }
-
-   while(bQuit == false)
-   {
-      cOption = CmdMenu(TALK);
-
-      switch(cOption)
-      {
-         case '/':
-            pInput = new CmdInput(CMD_MENU_NOCASE, "Talk");
-            // pInput->MenuAdd('i', "channel Info");
-            // pInput->MenuAdd('j', "Join a channel");
-            // pInput->MenuAdd('l', "List new messages");
-            pInput->MenuAdd('m', "eMote");
-            if(mask(CmdInput::MenuStatus(), LOGIN_SHADOW) == false)
-            {
-               pInput->MenuAdd('p', "Page");
-            }
-            pInput->MenuAdd('q', "Quit talk");
-            pInput->MenuAdd('w', "Who is logged in");
-            pInput->MenuAdd('x', "eXit (return to talk)");
-            cOption = CmdMenu(pInput);
-            switch(cOption)
-            {
-               case 'm':
-                  szText = CmdText(CMD_LINE_NOTITLE);
-                  if(strcmp(szText, "") != 0)
-                  {
-                     szEmote = new char[strlen(szText) + 2];
-                     szEmote[0] = ':';
-                     strcpy(szEmote + 1, szText);
-
-                     pRequest = new EDF();
-                     if(CmdVersion("2.5") >= 0)
-                     {
-                        pRequest->AddChild("folderid", iFolderID);
-                     }
-                     else
-                     {
-                        pRequest->AddChild("channelid", 0);
-                     }
-                     pRequest->AddChild("text", szEmote);
-                     // EDFPrint("TalkMenuOld send", pRequest);
-                     CmdRequest(CmdVersion("2.5") >= 0 ? MSG_MESSAGE_ADD : MSG_CHANNEL_SEND, pRequest);
-
-                     delete[] szEmote;
-                  }
-                  delete[] szText;
-                  break;
-
-               case 'p':
-                  CmdUserPage(NULL);
-                  break;
-
-               case 'q':
-                  pRequest = new EDF();
-                  if(CmdVersion("2.5") >= 0)
-                  {
-                     pRequest->AddChild("folderid", iFolderID);
-                  }
-                  else
-                  {
-                     pRequest->AddChild("channelid", 0);
-                  }
-                  CmdRequest(CmdVersion("2.5") >= 0 ? MSG_FOLDER_DEACTIVATE : MSG_CHANNEL_UNSUBSCRIBE, pRequest);
-                  bQuit = true;
-                  break;
-
-               case 'w':
-                  DefaultWholist();
-                  break;
-            }
-            break;
-
-         default:
-            szInit[0] = cOption;
-            szText = CmdText(CMD_LINE_NOTITLE, szInit);
-            if(strcmp(szText, "") != 0)
-            {
-               pRequest = new EDF();
-               if(CmdVersion("2.5") >= 0)
-               {
-                  pRequest->AddChild("folderid", iFolderID);
-               }
-               else
-               {
-                  pRequest->AddChild("channelid", 0);
-               }
-               pRequest->AddChild("text", szText);
-               // EDFPrint("TalkMenuOld send", pRequest);
-               CmdRequest(CmdVersion("2.5") >= 0 ? MSG_MESSAGE_ADD : MSG_CHANNEL_SEND, pRequest);
-            }
-            delete[] szText;
-            break;
-      }
-   }
-
-   debug(DEBUGLEVEL_INFO, "TalkMenuOld exit true\n");
-   return true;
 }
 
 bool PageMenu(EDF *pPage, bool bBell)
@@ -8961,10 +8440,6 @@ void MessageMenu()
          case 'v':
             CmdMessageAdd(-1, -1, -1, -1, NULL, MSGTYPE_VOTE);
             break;
-
-         case '/':
-            TalkCommandMenu(false, false, true, false, false, false);
-            break;
       }
    }
 }
@@ -9315,25 +8790,6 @@ void MainMenu()
             delete pReply;
             break;
 
-         case 't':
-            if(CmdVersion("2.6") >= 0)
-            {
-               TalkMenu();
-            }
-            else
-            {
-               TalkMenuOld();
-            }
-            break;
-
-         case 'T':
-            pRequest = new EDF();
-            pRequest->AddChild("searchtype", 3);
-
-            CmdRequest(MSG_CHANNEL_LIST, pRequest, &pReply);
-            CmdMessageTreeList(pReply, "channel", 0, 1);
-            break;
-
          case 'u':
             UserListMenu();
             break;
@@ -9344,10 +8800,6 @@ void MainMenu()
 
          case 'y':
             BulletinMenu(true);
-            break;
-
-         case '/':
-            TalkCommandMenu(false, false, true, false, false, false);
             break;
 
          default:

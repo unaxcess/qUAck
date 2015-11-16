@@ -65,8 +65,6 @@ void CmdMessageTreeList(EDF *pReply, const char *szType, int iListType, int iLis
 void CmdMessageTreeView(EDF *pReply, const char *szType);
 void CmdMessageList(EDF *pReply, int iListType);
 void CmdMessageView(EDF *pReply, int iFolderID, char *szFolderName, int iMsgNum, int iNumMsgs, bool bPage = true);
-void CmdChannelList(EDF *pReply);
-void CmdChannelView(EDF *pReply);
 void CmdUserList(EDF *pReply, int iListType, int iOwnerID);
 bool CmdUserListMatch(EDF *pReply, int iListType, int iOwnerID);
 void CmdUserWho(EDF *pReply, int iListType);

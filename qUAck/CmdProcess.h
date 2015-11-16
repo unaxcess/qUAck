@@ -35,9 +35,4 @@ void CmdCurrFolder(int iFolderID);
 int CmdCurrMessage();
 void CmdCurrMessage(int iMessageID);
 
-bool CmdChannelJoin(int iChannelID, const char *szPrompt = NULL);
-bool CmdChannelLeave();
-
-int CmdCurrChannel();
-
 #endif
