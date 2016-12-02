@@ -2106,7 +2106,7 @@ int main(int argc, char **argv)
       {
          do
          {
-            szUsername = CmdLineStr("Enter your username, NEW, GUEST or OFF", UA_NAME_LEN, CMD_LINE_NOESCAPE);
+            szUsername = CmdLineStr("Enter your username, NEW, or OFF", UA_NAME_LEN, CMD_LINE_NOESCAPE);
             if(stricmp(szUsername, "off") == 0)
             {
                CmdShutdown("Goodbye then");
@@ -2121,13 +2121,6 @@ int main(int argc, char **argv)
          }
          while(strcmp(szUsername, "") == 0);
 
-         if(stricmp(szUsername, "guest") == 0)
-         {
-            delete[] szUsername;
-            szUsername = NULL;
-
-            iUserType = USERTYPE_TEMP;
-         }
       }
       if(iUserType == 0 && szPassword == NULL)
       {
