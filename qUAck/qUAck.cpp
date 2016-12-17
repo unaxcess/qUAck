@@ -29,7 +29,6 @@
 #include "ua.h"
 
 #include "client/CliFolder.h"
-#include "client/CliTalk.h"
 #include "client/CliUser.h"
 
 #include "CmdIO.h"
@@ -74,7 +73,7 @@ bool m_bAnnounceFlush = false;
 
 EDF *m_pUser = NULL, *m_pPaging = NULL;
 EDF *m_pFolderList = NULL, *m_pFolderNav = NULL, *m_pMessageList = NULL, *m_pMessageView = NULL;
-EDF *m_pChannelList = NULL, *m_pUserList = NULL;
+EDF *m_pUserList = NULL;
 EDF *m_pServiceList = NULL;
 EDF *m_pSystemList = NULL;
 
@@ -166,7 +165,6 @@ void CmdStartup()
    m_pFolderNav = new EDF();
    m_pMessageList = new EDF();
    m_pMessageView = new EDF();
-   m_pChannelList = new EDF();
    m_pUserList = new EDF();
    m_pServiceList = new EDF();
 
@@ -238,7 +236,6 @@ void CmdShutdown(const char *szError, bool bDeleteLog, bool bSupressError)
    debug(DEBUGLEVEL_DEBUG, "CmdShutdown remove cached EDFs 5\n");
    delete m_pMessageView;
    debug(DEBUGLEVEL_DEBUG, "CmdShutdown remove cached EDFs 6\n");
-   delete m_pChannelList;
    debug(DEBUGLEVEL_DEBUG, "CmdShutdown remove cached EDFs 7\n");
    delete m_pUserList;
    debug(DEBUGLEVEL_DEBUG, "CmdShutdown remove cached EDFs 8\n");
@@ -338,23 +335,6 @@ bool CmdRefreshServices()
    CmdRequest(MSG_SERVICE_LIST, &m_pServiceList);
    m_pServiceList->Sort("service", "name");
    debug(DEBUGLEVEL_DEBUG, "CmdRefreshServices %ld ms\n", tickdiff(dTick));
-
-   return true;
-}
-
-bool CmdRefreshChannels()
-{
-   double dTick = gettick();
-   EDF *pRequest = NULL;
-
-   pRequest = new EDF();
-   pRequest->AddChild("searchtype", 3);
-
-   delete m_pChannelList;
-   CmdRequest(MSG_CHANNEL_LIST, pRequest, &m_pChannelList);
-   m_pChannelList->Sort("channel", "name", true);
-   debug("CmdRefreshChannels %ld ms\n", tickdiff(dTick));
-   debugEDFPrint(m_pChannelList);
 
    return true;
 }
@@ -673,7 +653,6 @@ void CmdRefresh(bool bUserReset)
    }
    CmdRefreshUsers();
    CmdRefreshFolders();
-   CmdRefreshChannels();
    CmdRefreshServices();
 
    lRecieved = (long)m_pClient->Recieved() - lRecieved;
@@ -1452,21 +1431,6 @@ int CmdLineName(const char *szType, const char *szTitle, CMDTABFUNC pTabFunc, ED
             FolderGet(pData, iInitID, &szMenu, true);
          }
       }
-      else if(stricmp(szType, "channel") == 0)
-      {
-         if(pTabFunc == NULL)
-         {
-            pTabFunc = CmdChannelTab;
-         }
-         if(pData == NULL)
-         {
-            pData = m_pChannelList;
-         }
-         if(iInitID != -1)
-         {
-            ChannelGet(pData, iInitID, &szMenu, true);
-         }
-      }
    }
 
    if(pTabDefault == NULL)
@@ -1544,13 +1508,6 @@ int CmdLineName(const char *szType, const char *szTitle, CMDTABFUNC pTabFunc, ED
                   iReturn = iInput;
                }
             }
-            else if(stricmp(szType, "channel") == 0)
-            {
-               if(ChannelGet(pData, iInput, NULL, true) == true)
-               {
-                  iReturn = iInput;
-               }
-            }
          }
          else
          {
@@ -1608,11 +1565,6 @@ int CmdLineFolder(int iInitID, char **szReturn, bool bValid)
 int CmdLineFolder(const char *szTitle, int iInitID, char **szReturn, bool bValid)
 {
    return CmdLineName("folder", szTitle, NULL, NULL, iInitID, szReturn, bValid, NULL, NULL);
-}
-
-int CmdLineChannel()
-{
-   return CmdLineName("channel", NULL, NULL, NULL, -1, NULL, true, NULL, NULL);
 }
 
 int CmdLineNum(const char *szTitle, int iOptions, int iDefault, int iInit)

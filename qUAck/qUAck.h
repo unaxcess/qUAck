@@ -45,7 +45,7 @@
 
 extern EDF *m_pUser, *m_pPaging;
 extern EDF *m_pFolderList, *m_pFolderNav, *m_pMessageList, *m_pMessageView;
-extern EDF *m_pChannelList, *m_pUserList;
+extern EDF *m_pUserList;
 extern EDF *m_pServiceList;
 extern EDF *m_pSystemList;
 
@@ -84,7 +84,6 @@ char *CmdLineStr(const char *szTitle, const char *szExtra, int iMax = -1, int iO
 char *CmdLineStr(int iMenuStatus);
 int CmdLineTab(const char *szTitle, CMDTABFUNC pTabFunc, EDF *pData);
 int CmdLineUser(CMDTABFUNC pTabFunc = CmdUserTab, int iInitID = -1, char **szReturn = NULL, bool bValid = true, const char *szDefaultPrompt = NULL, const char *szInit = NULL);
-int CmdLineChannel();
 int CmdLineFolder(int iInitID = -1, char **szReturn = NULL, bool bValid = true);
 int CmdLineFolder(const char *szTitle, int iInitID = -1, char **szReturn = NULL, bool bValid = true);
 int CmdLineNum(const char *szTitle, int iOptions = 0, int iDefault = 0, int iInit = 0);

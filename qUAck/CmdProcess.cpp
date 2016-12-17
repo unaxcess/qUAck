@@ -24,7 +24,6 @@
 #include "ua.h"
 
 #include "client/CliFolder.h"
-#include "client/CliTalk.h"
 #include "client/CliUser.h"
 
 #include "CmdIO.h"
@@ -35,7 +34,6 @@
 #include "qUAck.h"
 
 int m_iFolderID = -1, m_iMessageID = -1, m_iAddReplyID = -1, m_iAddReplyFolder = -1;
-int m_iChannelID = -1;
 
 bool CmdAnnounceProcess(EDF *pAnnounce)
 {
@@ -2307,116 +2305,3 @@ bool CmdMessageMark(int iFolderID, const char *szFolderName, int iMessageID)
    return true;
 }
 
-bool CmdChannelLeave()
-{
-   STACKTRACE
-   int iSubType = 0;
-   bool bReturn = false;
-   char *szRequest = NULL;
-   EDF *pRequest = NULL, *pReply = NULL;
-
-   if(ChannelGet(m_pChannelList, m_iChannelID) == false)
-   {
-      return false;
-   }
-
-   m_pChannelList->GetChild("subtype", &iSubType);
-   debug("CmdChannelLeave %d subtype %d\n", m_iChannelID, iSubType);
-
-   pRequest = new EDF();
-   pRequest->AddChild("channelid", m_iChannelID);
-
-   if(iSubType >= SUBTYPE_MEMBER)
-   {
-      szRequest = MSG_CHANNEL_SUBSCRIBE;
-
-      pRequest->AddChild("subtype", iSubType);
-      pRequest->AddChild("active", false);
-   }
-   else
-   {
-      szRequest = MSG_CHANNEL_UNSUBSCRIBE;
-   }
-
-   bReturn = CmdRequest(szRequest, pRequest, &pReply);
-
-   if(bReturn == true)
-   {
-      if(iSubType < SUBTYPE_MEMBER)
-      {
-         m_pChannelList->SetChild("subtype", 0);
-      }
-      m_pChannelList->DeleteChild("active");
-   }
-   else
-   {
-      debugEDFPrint("CmdChannelLeave request failed", pReply);
-   }
-
-   delete pReply;
-
-   m_iChannelID = -1;
-
-   return true;
-}
-
-bool CmdChannelJoin(int iChannelID, const char *szPrompt)
-{
-   STACKTRACE
-   int iSubType = 0;
-   EDF *pRequest = NULL, *pReply = NULL;
-
-   if(ChannelGet(m_pChannelList, iChannelID) == false)
-   {
-      return false;
-   }
-
-   m_pChannelList->GetChild("subtype", &iSubType);
-
-   if(iSubType == 0)
-   {
-      if(szPrompt == NULL)
-      {
-         szPrompt = "You are not subscribed. Subscribe now";
-      }
-      if(CmdYesNo(szPrompt, false) == false)
-      {
-         return false;
-      }
-   }
-
-   pRequest = new EDF();
-   pRequest->AddChild("channelid", iChannelID);
-   pRequest->AddChild("active", true);
-
-   if(CmdRequest(MSG_CHANNEL_SUBSCRIBE, pRequest, &pReply) == false)
-   {
-      CmdEDFPrint("CmdChannelJoin request failed", pReply);
-
-      delete pReply;
-
-      return false;
-   }
-
-   delete pReply;
-
-   if(iSubType == 0)
-   {
-      m_pChannelList->SetChild("subtype", SUBTYPE_SUB);
-   }
-   m_pChannelList->SetChild("active", true);
-
-   if(m_iChannelID != -1)
-   {
-      CmdChannelLeave();
-   }
-
-   m_iChannelID = iChannelID;
-
-   return true;
-}
-
-int CmdCurrChannel()
-{
-   return m_iChannelID;
-}

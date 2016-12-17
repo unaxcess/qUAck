@@ -997,17 +997,6 @@ void CmdSystemView(EDF *pReply)
       sprintf(szWrite, "Users: \0373%d\0370 (max ID \0373%d\0370)\n", iCount, iMax);
       CmdWrite(szWrite);
 
-      if(CmdVersion("2.5") < 0)
-      {
-         CmdWrite("\n");
-
-         iCount = 0;
-         pReply->GetChild("numchannels", &iCount);
-         pReply->GetChild("maxchannelmsgid", &iMax);
-         sprintf(szWrite, "Channels: \0373%d\0370 (max message ID \0373%d\0370)\n", iCount, iMax);
-         CmdWrite(szWrite);
-      }
-
       if(CmdVersion("2.5") >= 0)
       {
          iCount = 0;
@@ -1701,11 +1690,6 @@ void CmdMessageTreeView(EDF *pReply, const char *szType)
    sprintf(szTypeName, "%sname", szType);
    sprintf(szTypeID, "%sid", szType);
 
-   if(strcmp(szType, "channel") == 0)
-   {
-      iActive = SUBINFO_ACTIVE;
-   }
-
    CmdPageOn();
 
    m_pUser->Root();
@@ -1915,7 +1899,7 @@ void CmdMessageTreeView(EDF *pReply, const char *szType)
    STACKTRACEUPDATE
 
    iSubs = CmdSubList(pReply, SUBTYPE_MEMBER, SUBINFO_TREE | iActive, NULL, bRetro);
-   if(mask(iTreeMode, ACCMODE_SUB_READ) == false || stricmp(szType, "channel") == 0)
+   if(mask(iTreeMode, ACCMODE_SUB_READ) == false)
    {
       iSubs += CmdSubList(pReply, SUBTYPE_SUB, SUBINFO_TREE | iActive, NULL, bRetro);
    }
@@ -2831,185 +2815,6 @@ void CmdMessageView(EDF *pReply, int iFolderID, char *szFolderName, int iMsgNum,
    // debug("CmdMessageView exit\n");
 }
 
-void CmdChannelList(EDF *pReply)
-{
-   STACKTRACE
-   int iAccessLevel = LEVEL_NONE, iNumChannels = 0, iFound = 0, iNumMsgs = 0, iTotalMsgs = 0, iSubscribed = 0, iSubType = 0;
-   bool bLoop = false;
-   char *szName = NULL;
-   // char szWrite[200];
-   // struct channelslot *clist = NULL;
-   CmdTable *pTable = NULL;
-
-   // pReply->GetChild("searchtype", &iType);
-
-   debug(DEBUGLEVEL_INFO, "CmdChannelList entry\n");
-   // EDFPrint(NULL, pReply);
-
-   m_pUser->GetChild("accesslevel", &iAccessLevel);
-
-   pReply->GetChild("numchannels", &iNumChannels);
-   pReply->GetChild("found", &iFound);
-
-   pReply->Sort("channel", "name", true);
-
-   pTable = new CmdTable(m_pUser, 1, iAccessLevel >= LEVEL_WITNESS ? 3 : 2, true);
-
-   pTable->AddHeader("Name", UA_NAME_LEN, 'g');
-   pTable->AddHeader("Msgs", 8, '\0', CMDTABLE_RIGHT);
-   pTable->AddHeader("Size", 8, '\0', CMDTABLE_RIGHT);
-
-   debug(DEBUGLEVEL_DEBUG, "CmdChannelList content %d\n", iFound);
-   bLoop = pReply->Child("channel");
-   // for(iChannelNum = 0; iChannelNum < iFound; iChannelNum++)
-   while(bLoop == true)
-   {
-      szName = NULL;
-      iSubType = 0;
-      iNumMsgs = 0;
-      iTotalMsgs = 0;
-
-      pReply->GetChild("name", &szName);
-      pReply->GetChild("subtype", &iSubType);
-      pReply->GetChild("nummsgs", &iNumMsgs);
-      pReply->GetChild("totalmsgs", &iTotalMsgs);
-
-      pTable->SetFlag(iSubType > 0 ? 'S' : ' ');
-      pTable->SetValue(szName);
-      pTable->SetValue(iNumMsgs);
-      if(iAccessLevel >= LEVEL_WITNESS)
-      {
-         pTable->SetValue(iTotalMsgs);
-      }
-
-      delete[] szName;
-
-      if(iSubType > 0)
-      {
-         iSubscribed++;
-      }
-
-      bLoop = pReply->Child("channel");
-   }
-
-   pTable->AddFooter(iNumChannels, "channel");
-   pTable->AddFooter(iFound, "found");
-   pTable->AddFooter(iSubscribed, "sucsribed");
-
-   delete pTable;
-
-   debug(DEBUGLEVEL_INFO, "CmdChannelList exit\n");
-}
-
-void CmdChannelView(EDF *pReply)
-{
-   STACKTRACE
-   int iChannelID = 0, iNumMsgs = 0, iSize = 0, iValue = 0, iAccessLevel = LEVEL_NONE, iSubs = 0, iMaxMsgs = 0;
-   bool bRetro = false;
-   char *szChannelName = NULL, szWrite[100], *szValue = NULL;
-   // struct tm *tmDate = NULL;
-
-   m_pUser->GetChild("accesslevel", &iAccessLevel);
-   if(m_pUser->Child("client", CLIENT_NAME()) == true)
-   {
-      bRetro = CmdRetroNames(m_pUser);
-      m_pUser->Parent();
-   }
-
-   debug(DEBUGLEVEL_INFO, "CmdChannelView entry %d\n", iAccessLevel);
-   // EDFPrint(NULL, pReply);
-
-   pReply->Get(NULL, &iChannelID);
-   debug(DEBUGLEVEL_DEBUG, "ChannelShow ID %d\n", iChannelID);
-
-   debug(DEBUGLEVEL_DEBUG, "ChannelShow content\n");
-   pReply->GetChild("name", &szChannelName);
-   strcpy(szWrite, "");
-   if(szChannelName != NULL)
-   {
-      // sprintf(szWrite, "Name: \0373%s\0370\n", RETRO_NAME(szChannelName));
-      CmdField("Name", '3', RETRO_NAME(szChannelName));
-   }
-   if(iAccessLevel >= LEVEL_WITNESS)
-   {
-      // sprintf(szWrite, "%sID:   \0373%d\0370\n", szWrite, iChannelID);
-      CmdField("ID", '3', iChannelID);
-   }
-   // CmdWrite(szWrite);
-
-   if(pReply->Child("info") == true)
-   {
-      debug(DEBUGLEVEL_DEBUG, "CmdChannelInfo info entry\n");
-
-      pReply->GetChild("date", &iValue);
-      // tmDate = localtime((time_t *)&iValue);
-      // strftime(szWrite, sizeof(szWrite), "\nDate: \0373%A, %d %B %Y - %H:%M\0370\n", tmDate);
-      StrTime(szWrite, STRTIME_LONG, iValue, '3', "\nDate: ", "\n");
-      CmdWrite(szWrite);
-
-      szValue = NULL;
-      if(pReply->GetChild("fromname", &szValue) == true)
-      {
-         // sprintf(szWrite, "From: \0377%s\0370\n", szValue);
-         // CmdWrite(szWrite);
-         CmdField("From", '7', szValue);
-         delete[] szValue;
-      }
-
-      szValue = NULL;
-      if(pReply->GetChild("text", &szValue) == true)
-      {
-         CmdWrite("\n");
-         CmdWrite(szValue, CMD_OUT_NOHIGHLIGHT | CMD_OUT_UTF);
-         CmdWrite("\n\n");
-         delete[] szValue;
-      }
-      pReply->Parent();
-
-      debug(DEBUGLEVEL_DEBUG, "CmdChannelInfo info exit\n");
-   }
-   else
-   {
-      CmdWrite("\n");
-   }
-
-   pReply->GetChild("nummsgs", &iNumMsgs);
-   pReply->GetChild("totalmsgs", &iSize);
-   pReply->GetChild("maxmsgs", &iMaxMsgs);
-   if(iAccessLevel >= LEVEL_WITNESS)
-   {
-      sprintf(szWrite, "Messages:    \0373%d\0370 (", iNumMsgs);
-      if(iMaxMsgs > 0)
-      {
-         sprintf(szWrite, "%smaximum \0373%d\0370, ", szWrite, iMaxMsgs);
-      }
-      sprintf(szWrite, "%stotal size \0373%d\0370 bytes)\n", szWrite, iSize);
-      CmdWrite(szWrite);
-
-      pReply->GetChild("created", &iValue);
-      // tmDate = localtime((time_t *)&iValue);
-      // strftime(szWrite, 64, "Created:     \0373%A, %d %B, %Y - %H:%M\0370\n", tmDate);
-      StrTime(szWrite, STRTIME_LONG, iValue, '3', "Created:    ", "\n");
-      CmdWrite(szWrite);
-   }
-   else
-   {
-      // sprintf(szWrite, "Messages: \0373%d\0370\n", iNumMsgs);
-      // CmdWrite(szWrite);
-      CmdField("Messages", '3', iNumMsgs);
-   }
-   CmdWrite("\n");
-
-   iSubs = CmdSubList(pReply, SUBTYPE_SUB, SUBINFO_TREE, NULL, bRetro);
-   if(iSubs > 0)
-   {
-      CmdWrite("\n");
-   }
-
-   delete[] szChannelName;
-
-   debug(DEBUGLEVEL_INFO, "CmdChannelView exit\n");
-}
 
 void CmdUserList(EDF *pReply, int iListType, int iOwnerID)
 {
@@ -3131,7 +2936,7 @@ void CmdUserWho(EDF *pReply, int iListType)
    int iAccessLevel = LEVEL_NONE, iWidth = 80, iSystemTime = 0, iFound = 0, iHidden = 0, iHiddenTime = 10800;
    int iUserStatus = LOGIN_OFF, iUserLevel = LEVEL_NONE, iUserType = USERTYPE_NONE, iMaxFlags = 0;
    int iAccessLen = 8, iNameLen = 4, iTimeVal = 0, iNumFlags = 0, iTimeIdle = 0, iExtra = 0;
-   int iNumLogins = 0, iNumRows = 0, iIdle = 0, iBusy = 0, iTalking = 0, iAgents = 0, iConnID = 0;//, iPos = 0;
+   int iNumLogins = 0, iNumRows = 0, iIdle = 0, iBusy = 0, iAgents = 0, iConnID = 0;//, iPos = 0;
    bool bRetro = false, bLoop = false, bHidden = false, bAccessNames = true, bSecure = false;
    char *szType = NULL, *szUserName = NULL, *szUserAccess = NULL, *szField1 = NULL, *szField2 = NULL;
    char szTime[10], *szColTime = "Time", szConn[30];
@@ -3219,7 +3024,6 @@ void CmdUserWho(EDF *pReply, int iListType)
       pReply->Sort(NULL, "timeon", false, true, "login");
    } */
 
-   iMaxFlags++; // LOGIN_TALK
    if(iListType != 4 && iListType != 5) // && mask(iUserStatus, LOGIN_IDLE) == true)
    {
       iMaxFlags++;
@@ -3273,10 +3077,6 @@ void CmdUserWho(EDF *pReply, int iListType)
             {
                iNumFlags++;
             }
-            if(mask(iUserStatus, LOGIN_TALKING) == true)
-            {
-               iNumFlags++;
-            }
             if(mask(iUserStatus, LOGIN_SILENT) == true)
             {
                iNumFlags++;
@@ -3326,22 +3126,7 @@ void CmdUserWho(EDF *pReply, int iListType)
 
    pReply->Root();
 
-   /* if(iListType != 4 && iListType != 5)
-   {
-      // Flag for idle
-      iNumFlags++;
-   }
-   if(iListType != 8)
-   {
-      // Flag for busy
-      iNumFlags++;
-   } */
-   // Flags for talking and silent (admin and agent owners, best make it everyone)
-   // iNumFlags += 2;
-   // printf("CmdUserWho %d flags in table\n", iNumFlags);
 
-   // debug("CmdUserWho header\n");
-   // debug("CmdUserWho %d flags\n", iMaxFlags);
    if(iListType == 3)
    {
       pTable = new CmdTable(m_pUser, iMaxFlags, 1, true, true);
@@ -3609,10 +3394,6 @@ void CmdUserWho(EDF *pReply, int iListType)
          {
             iBusy++;
          }
-         if(mask(iUserStatus, LOGIN_TALKING) == true)
-         {
-            iTalking++;
-         }
          if(mask(iUserStatus, LOGIN_AGENT) == true)
          {
             iAgents++;
@@ -3642,10 +3423,6 @@ void CmdUserWho(EDF *pReply, int iListType)
             if(iListType != 8) // && mask(iUserStatus, LOGIN_BUSY) == true)
             {
                pTable->SetFlag(mask(iUserStatus, LOGIN_BUSY) == true ? 'B' : ' ');
-            }
-            if(mask(iUserStatus, LOGIN_TALKING) == true)
-            {
-               pTable->SetFlag('T');
             }
             if(mask(iUserStatus, LOGIN_SILENT) == true)
             {
@@ -3747,7 +3524,6 @@ void CmdUserWho(EDF *pReply, int iListType)
    }
    pTable->AddKey('I', "Idle");
    pTable->AddKey('B', "Busy");
-   pTable->AddKey('T', "Talking");
    pTable->AddKey('S', "Silent");
    pTable->AddKey('H', "sHadow");
    pTable->AddKey('N', "No-contact");
