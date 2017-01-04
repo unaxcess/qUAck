@@ -2712,9 +2712,8 @@ char *URLToken(char **szString)
 
 int CmdURLList(const char *szString, int iContentNum, bool bDisplay, int iItemNum, char **szReturn)
 {
-   bool bSlash = false;
-   int iURLBack = 0, iAddressLen = 0;
-   char *szURL = NULL, *szHTTP = NULL, *szWWW = NULL, *szAddress = NULL;
+   int iAddressLen = 0;
+   char *szURL = NULL, *szAddress = NULL;
 
    /* if(szString == NULL)
    {
@@ -3853,7 +3852,7 @@ bool MessageMarkMenu(bool bAdd, int iFolderID, int iMessageID, int iFromID, cons
          iEndDate -= 60 * tmTime->tm_min;
          iEndDate -= tmTime->tm_sec;
          break;
-         
+
       case 'v':
          szRequest = MSG_MESSAGE_MARK_SAVE;
          break;
@@ -4349,7 +4348,7 @@ void FolderMenu(int iFolderID, int iMessageID, int iMsgPos)
 {
    STACKTRACE
    int iUserID = 0, iAccessLevel = LEVEL_NONE, iInitPos = 0, iVoteType = 0, iFromID = -1, iVoteID = 0;
-   int iAccessMode = FOLDERMODE_NORMAL, iStatus = LOGIN_OFF, iRetro = 0, iConfirm = 0, iMessageTop = 0, iValue = 0;
+   int iAccessMode = FOLDERMODE_NORMAL, iStatus = LOGIN_OFF, iRetro = 0, iConfirm = 0, iMessageTop = 0;
    bool bLoop = true, bAction = false, bRetro = false, bOldMenus = false, bValid = false;
    char cOption = '\0', szWrite[100], szFilename[100];
    char *szFolderName = NULL, *szOption = NULL, *szValue = NULL, *szUsername = NULL, *szFromName = NULL, *szSubject = NULL;
@@ -8343,7 +8342,7 @@ void MessageMenu()
 {
    int iMessageID = -1, iVoteType = 0;
    char cOption = '\0';
-   EDF *pRequest = NULL, *pReply = NULL, *pTemp = NULL, *pMessageIn, *pMessageOut = NULL;
+   EDF *pRequest = NULL, *pReply = NULL, *pTemp = NULL;
 
    while(cOption != 'j' && cOption != 'x')
    {
