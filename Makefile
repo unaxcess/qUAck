@@ -10,3 +10,6 @@ clean:
 		cd qUAck ; make clean
 install:
 		cd qUAck ; make install
+
+container:
+		docker build --file Dockerfile.build . -t unaxcess/quack:latest
