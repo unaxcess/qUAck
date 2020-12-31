@@ -146,10 +146,10 @@ int ConnVerify(int iOK, X509_STORE_CTX *pContext)
       }
    }
 
-   switch(pContext->error)
+   switch(X509_STORE_CTX_get_error(pContext))
    {
       case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT:
-         X509_NAME_oneline(X509_get_issuer_name(pContext->current_cert), szBuffer, sizeof(szBuffer));
+         X509_NAME_oneline(X509_get_issuer_name(pCert), szBuffer, sizeof(szBuffer));
          debug("ConnVerify issuer = %s\n", szBuffer);
          break;
 
@@ -249,6 +249,8 @@ void ConnCertify(SSL *pSSL)
          PEM_write_bio_X509(bio,peer); */
          // debug("   peer %s\n", pPeer);
 
+         /*
+
          debug("  c = ");
          for(iCharPos = 0; iCharPos < pPeer->cert_info->key->public_key->length; iCharPos++)
          {
@@ -261,6 +263,8 @@ void ConnCertify(SSL *pSSL)
 
          X509_NAME_oneline(X509_get_issuer_name(pPeer), szBuffer, BUFFER_SIZE);
          debug("  i = %s\n", szBuffer);
+
+         */
 
          pKey = X509_get_pubkey(pPeer);
          debug("ConnCertify peer public key %d bits\n", EVP_PKEY_bits(pKey));
@@ -306,11 +310,13 @@ void ConnCertify(SSL *pSSL)
    pCipher = SSL_get_current_cipher(pSSL);
    // if(pCipher != NULL)
    {
-      debug("ConnCertify cypher %s, name = %s, version = %s\n", pSSL->hit ? "Reused" : "New", SSL_CIPHER_get_name(pCipher), SSL_CIPHER_get_version(pCipher));
+      debug("ConnCertify cypher %s, name = %s, version = %s\n", SSL_session_reused(pSSL) ? "Reused" : "New", SSL_CIPHER_get_name(pCipher), SSL_CIPHER_get_version(pCipher));
    }
 
    // SSL_SESSION_print(bio,SSL_get_session(pSSL));
    // SSL_SESSION_print_fp(debugfile(), SSL_get_session(pSSL));
+
+   /*
 
    pSession = pSSL->session;
    if(pSession != NULL)
@@ -319,6 +325,8 @@ void ConnCertify(SSL *pSSL)
       ConnCertifyData("SID context", pSession->sid_ctx, pSession->sid_ctx_length);
       ConnCertifyData("Master key", pSession->master_key, pSession->master_key_length);
    }
+
+   */
 
    debug("ConnCertify exit\n");
 }
