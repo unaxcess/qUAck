@@ -1,7 +1,6 @@
-FROM centos:7
+FROM centos:8
 WORKDIR /root/
 COPY . src
 
 RUN cd src && ./build.sh
 
-#CMD ["/usr/sbin/ICE", "-config", "/etc/ua2/ua.edf"]
